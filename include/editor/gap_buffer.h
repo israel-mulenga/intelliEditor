@@ -9,7 +9,7 @@ typedef struct {
     char *buffer;       
     size_t gap_start;   
     size_t gap_end;     
-    size_t buffer_size; 
+    size_t size; 
 } GapBuffer;
 
 GapBuffer* gap_buffer_create(size_t initial_capacity);
