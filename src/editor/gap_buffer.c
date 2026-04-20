@@ -86,3 +86,36 @@ void gap_buffer_insert(GapBuffer *gb, char c){
     gb->buffer[gb->gap_start] = c;
     gb->gap_start++;
 }
+
+
+char* gap_buffer_get_content(GapBuffer *gb) {
+    size_t prefix_len = gb->gap_start;
+    size_t suffix_len = gb->size - gb->gap_end;
+    size_t text_length = prefix_len + suffix_len;
+
+    char *text = malloc(text_length + 1);
+    if (!text) return NULL; // Sécurité Malloc
+
+    // 1. On colle la partie gauche au début
+    memcpy(text, gb->buffer, prefix_len);
+
+    // 2. On colle la partie droite JUSTE APRÈS la gauche
+    memcpy(text + prefix_len, gb->buffer + gb->gap_end, suffix_len);
+
+    // 3. CRUCIAL : On ferme la chaîne de caractères
+    text[text_length] = '\0';
+
+    return text;
+}
+
+void gap_buffer_backspace(GapBuffer *gb) {
+    if (gb->gap_start > 0) {
+        gb->gap_start--;
+    }
+}
+
+void gap_buffer_delete(GapBuffer *gb) {
+    if (gb->gap_end < gb->size) {
+        gb->gap_end++;
+    }
+}
