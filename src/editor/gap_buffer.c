@@ -43,3 +43,11 @@ void gap_buffer_move_cursor(GapBuffer *gb, size_t new_position) {
     }
 }
 
+void gap_buffer_insert(GapBuffer *gb, char c){
+    if(gb->gap_start == gb->gap_end){
+        // TODO Implement RESIZE
+        
+    }
+    gb->buffer[gb->gap_start] = c;
+    gb->gap_start++;
+}
