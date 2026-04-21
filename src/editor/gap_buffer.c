@@ -104,3 +104,16 @@ void gap_buffer_delete(GapBuffer *gb) {
         gb->gap_end++;
     }
 }
+
+CursorPos gap_buffer_get_cursor_pos(GapBuffer *gb) {
+    CursorPos pos = {0, 0};
+    for (size_t i = 0; i < gb->gap_start; i++) {
+        if (gb->buffer[i] == '\n') {
+            pos.y++;
+            pos.x = 0;
+        } else {
+            pos.x++;
+        }
+    }
+    return pos;
+}

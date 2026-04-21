@@ -13,7 +13,7 @@ include_directories(include ${GTK3_INCLUDE_DIRS})
 link_directories(${GTK3_LIBRARY_DIRS})
 
 # --- EXÉCUTABLE PRINCIPAL ---
-add_executable(IntelliEditor src/main.c src/editor/gap_buffer.c)
+add_executable(IntelliEditor src/main.c src/editor/gap_buffer.c src/editor/file_manager.c)
 target_link_libraries(IntelliEditor ${GTK3_LIBRARIES})
 
 # --- EXÉCUTABLE DE TESTS ---

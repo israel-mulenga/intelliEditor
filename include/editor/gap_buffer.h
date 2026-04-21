@@ -12,6 +12,11 @@ typedef struct {
     size_t size; 
 } GapBuffer;
 
+typedef struct {
+    size_t x; // Colonne (0-based)
+    size_t y; // Ligne (0-based)
+} CursorPos;
+
 GapBuffer* gap_buffer_create(size_t initial_capacity);
 GapBuffer* gap_buffer_resize(GapBuffer *gb);
 void gap_buffer_insert(GapBuffer *gb, char c);
@@ -21,5 +26,5 @@ void gap_buffer_destroy(GapBuffer *gb);
 char* gap_buffer_get_content(GapBuffer *gb);
 void gap_buffer_backspace(GapBuffer *gb);
 GapBuffer *gap_buffer_load_from_file(const char *filename);
-
+CursorPos gap_buffer_get_cursor_pos(GapBuffer *gb);
 #endif 
