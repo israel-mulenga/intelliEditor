@@ -117,3 +117,48 @@ CursorPos gap_buffer_get_cursor_pos(GapBuffer *gb) {
     }
     return pos;
 }
+
+void gap_buffer_set_cursor_pos(GapBuffer *gb, int x, int y) {
+    size_t current_x = 0;
+    size_t current_y = 0;
+    size_t logical_pos = 0;
+    
+    // On calcule la taille totale du texte (sans le gap)
+    size_t total_text_len = gb->size - (gb->gap_end - gb->gap_start);
+
+    // On parcourt le texte de manière "logique"
+    while (logical_pos < total_text_len) {
+        // Si on a atteint la bonne ligne et la bonne colonne
+        if (current_y == (size_t)y && current_x == (size_t)x) {
+            break;
+        }
+
+        // On récupère le caractère à la position logique
+        // (Si l'index dépasse gap_start, on saute à gap_end)
+        size_t physical_pos = (logical_pos < gb->gap_start) ? 
+                               logical_pos : 
+                               logical_pos + (gb->gap_end - gb->gap_start);
+        
+        char c = gb->buffer[physical_pos];
+
+        if (c == '\n') {
+            // Si on cherche une position sur cette ligne mais que x est trop grand,
+            // on s'arrête à la fin de la ligne actuelle
+            if (current_y == (size_t)y) {
+                break; 
+            }
+            current_y++;
+            current_x = 0;
+        } else {
+            current_x++;
+        }
+
+        logical_pos++;
+        
+        // Sécurité : si on a dépassé la ligne cible, on s'arrête
+        if (current_y > (size_t)y) break;
+    }
+
+    // On déplace physiquement le gap à cette position logique
+    gap_buffer_move_cursor(gb, logical_pos);
+}
