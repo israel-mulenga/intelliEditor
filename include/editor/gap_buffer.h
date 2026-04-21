@@ -20,5 +20,6 @@ void gap_buffer_move_cursor(GapBuffer *gb, size_t new_position);
 void gap_buffer_destroy(GapBuffer *gb);
 char* gap_buffer_get_content(GapBuffer *gb);
 void gap_buffer_backspace(GapBuffer *gb);
+GapBuffer *gap_buffer_load_from_file(const char *filename);
 
 #endif 
