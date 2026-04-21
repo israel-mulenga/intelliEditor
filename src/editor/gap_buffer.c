@@ -21,28 +21,18 @@ GapBuffer* gap_buffer_create(size_t initial_capacity) {
 
 void gap_buffer_move_cursor(GapBuffer *gb, size_t new_position) {
     size_t current_text_length = gb->size - (gb->gap_end - gb->gap_start);
+    if (new_position > current_text_length) new_position = current_text_length;
 
-    if (new_position > current_text_length) {
-        fprintf(stderr, "Error : Position overflow\n");
-        return;
+    while(gb->gap_start > new_position) {
+        gb->gap_start--;
+        gb->gap_end--;
+        gb->buffer[gb->gap_end] = gb->buffer[gb->gap_start];
     }
 
-
-    if (new_position < gb->gap_start) {
-        // MOUVEMENT VERS LA GAUCHE
-        size_t distance = gb->gap_start - new_position;
-        memmove(&gb->buffer[gb->gap_end - distance], &gb->buffer[new_position], distance);
-        
-        gb->gap_start -= distance;
-        gb->gap_end -= distance;
-    } 
-    else if (new_position > gb->gap_start) {
-        // MOUVEMENT VERS LA DROITE
-        size_t distance = new_position - gb->gap_start;
-        memmove(&gb->buffer[gb->gap_start], &gb->buffer[gb->gap_end], distance);
-        
-        gb->gap_start += distance;
-        gb->gap_end += distance;
+    while(gb->gap_start < new_position){
+        gb->buffer[gb->gap_start] = gb->buffer[gb->gap_end];
+        gb->gap_start++;
+        gb->gap_end++;
     }
 }
 
@@ -94,15 +84,10 @@ char* gap_buffer_get_content(GapBuffer *gb) {
     size_t text_length = prefix_len + suffix_len;
 
     char *text = malloc(text_length + 1);
-    if (!text) return NULL; // Sécurité Malloc
+    if (!text) return NULL;
 
-    // 1. On colle la partie gauche au début
     memcpy(text, gb->buffer, prefix_len);
-
-    // 2. On colle la partie droite JUSTE APRÈS la gauche
     memcpy(text + prefix_len, gb->buffer + gb->gap_end, suffix_len);
-
-    // 3. CRUCIAL : On ferme la chaîne de caractères
     text[text_length] = '\0';
 
     return text;
