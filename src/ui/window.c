@@ -9,6 +9,7 @@
 // ======================================
 
 void create_main_window(GtkApplication *app, gpointer user_data) {
+    (void)user_data;
 
     GtkWidget *window;
     GtkWidget *vbox;        // vertical container
