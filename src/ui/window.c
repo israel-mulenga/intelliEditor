@@ -1,7 +1,7 @@
-#include "ui/window.h"
-#include "ui/editor.h"
-#include "ui/sidebar.h"
-#include "ui/toolbar.h"
+#include "../../include/ui/window.h"
+#include "../../include/ui/editor.h"
+#include "../../include/ui/sidebar.h"
+#include "../../include/ui/toolbar.h"
 
 // ======================================
 // MODULE: WINDOW

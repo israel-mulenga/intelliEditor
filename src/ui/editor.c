@@ -1,2 +1,5 @@
 #include "ui/editor.h"
-#include <gtksourceview/gtksource.h>
+
+GtkWidget* create_editor() {
+    return gtk_text_view_new();
+}
