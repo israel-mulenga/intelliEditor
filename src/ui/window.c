@@ -47,6 +47,9 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     // Add sidebar (right side)
     gtk_box_pack_start(GTK_BOX(hbox), sidebar, FALSE, FALSE, 5);
 
+    // Connect destroy signal
+    g_signal_connect(window, "destroy", G_CALLBACK(g_application_quit), app);
+
     // Show everything
     gtk_widget_show_all(window);
 }
