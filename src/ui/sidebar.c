@@ -17,8 +17,9 @@ GtkWidget* create_sidebar() {
     gtk_container_set_border_width(GTK_CONTAINER(box), 10);
 
     // Temporary text (will be replaced later)
-    label = gtk_label_new("Rules will appear here");
+    label = gtk_label_new("Mots incorrects s'afficheront ici.");
     gtk_widget_set_name(label, "sidebar-label");
+    g_object_set_data(G_OBJECT(box), "sidebar-label", label);
 
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
 

@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 
-GtkWidget* create_toolbar();
+typedef struct _AppWidgets AppWidgets;
+
+GtkWidget* create_toolbar(AppWidgets *app_widgets);
 
 #endif

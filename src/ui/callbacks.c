@@ -1,4 +1,5 @@
 #include "ui/callbacks.h"
+#include "ui/window.h"
 #include <stdio.h>
 
 // ======================================
@@ -6,11 +7,86 @@
 // ROLE: Handle user actions (button clicks)
 // ======================================
 
+static gboolean is_word_correct(AppWidgets *app_widgets, const gchar *word) {
+    if (app_widgets->hun_en && Hunspell_spell(app_widgets->hun_en, word)) {
+        return TRUE;
+    }
+    if (app_widgets->hun_fr && Hunspell_spell(app_widgets->hun_fr, word)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static gchar* check_spelling(AppWidgets *app_widgets) {
+    GtkTextIter start, end;
+    gchar *text;
+    gchar **words;
+    GString *result;
+    gint wrong_count = 0;
+    const gchar *separators = " \t\n\r.,;:!?\"'()[]{}<>@#$%^&*-_=+/\\|`~";
+
+    if (!app_widgets->editor_buffer) {
+        return g_strdup("Erreur : éditeur non disponible.");
+    }
+
+    gtk_text_buffer_get_start_iter(app_widgets->editor_buffer, &start);
+    gtk_text_buffer_get_end_iter(app_widgets->editor_buffer, &end);
+    text = gtk_text_buffer_get_text(app_widgets->editor_buffer, &start, &end, FALSE);
+    words = g_strsplit_set(text, separators, -1);
+    result = g_string_new(NULL);
+
+    if (!app_widgets->hun_en && !app_widgets->hun_fr) {
+        g_string_assign(result, "Dictionnaires Hunspell non trouvés. Installez hunspell et les dictionnaires.");
+    } else {
+        for (guint i = 0; words[i] != NULL; i++) {
+            gchar *word = words[i];
+            gchar *clean;
+            gchar *lower;
+
+            clean = g_strstrip(word);
+            if (*clean == '\0') {
+                continue;
+            }
+
+            lower = g_utf8_strdown(clean, -1);
+            if (!is_word_correct(app_widgets, lower)) {
+                if (wrong_count == 0) {
+                    g_string_append(result, "Mots incorrects :\n");
+                }
+                g_string_append_printf(result, "%d. %s\n", wrong_count + 1, lower);
+                wrong_count++;
+            }
+            g_free(lower);
+        }
+
+        if (wrong_count == 0) {
+            g_string_assign(result, "Aucun mot incorrect trouvé.");
+        }
+    }
+
+    g_strfreev(words);
+    g_free(text);
+    return g_string_free(result, FALSE);
+}
+
+static void update_sidebar_text(AppWidgets *app_widgets, const gchar *text) {
+    if (!app_widgets || !app_widgets->sidebar) {
+        return;
+    }
+
+    GtkWidget *label = GTK_WIDGET(g_object_get_data(G_OBJECT(app_widgets->sidebar), "sidebar-label"));
+    if (GTK_IS_LABEL(label)) {
+        gtk_label_set_text(GTK_LABEL(label), text);
+    }
+}
+
 // Called when "Correct" button is clicked
 void on_correct_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
-    (void)data;
-    printf("Correct button clicked\n");
+    AppWidgets *app_widgets = (AppWidgets *)data;
+    gchar *message = check_spelling(app_widgets);
+    update_sidebar_text(app_widgets, message);
+    g_free(message);
 }
 
 // Called when "Rewrite" button is clicked

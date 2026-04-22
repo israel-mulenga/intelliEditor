@@ -9,14 +9,11 @@
 // ROLE: Create the main application window
 // ======================================
 
-typedef struct {
-    GtkWidget *stack;
-    GtkApplication *app;
-} AppWidgets;
-
 static void setup_css(void);
 static GtkWidget* create_welcome_page(AppWidgets *app_widgets);
-static GtkWidget* create_editor_page(void);
+static GtkWidget* create_editor_page(AppWidgets *app_widgets);
+static Hunhandle* create_hunspell_dictionary(const gchar *lang);
+static void cleanup_app_widgets(GtkWidget *widget, gpointer data);
 
 void create_main_window(GtkApplication *app, gpointer user_data) {
     (void)user_data;
@@ -28,6 +25,12 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     AppWidgets *app_widgets;
 
     setup_css();
+
+    // Allocate state shared between callbacks and pages
+    app_widgets = g_new0(AppWidgets, 1);
+    app_widgets->app = app;
+    app_widgets->hun_en = create_hunspell_dictionary("en_US");
+    app_widgets->hun_fr = create_hunspell_dictionary("fr_FR");
 
     // Create the main application window
     window = gtk_application_window_new(app);
@@ -41,20 +44,40 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     gtk_stack_set_transition_duration(GTK_STACK(stack), 250);
     gtk_container_add(GTK_CONTAINER(window), stack);
-
-    app_widgets = g_new0(AppWidgets, 1);
     app_widgets->stack = stack;
-    app_widgets->app = app;
 
     welcome_page = create_welcome_page(app_widgets);
-    editor_page = create_editor_page();
+    editor_page = create_editor_page(app_widgets);
 
     gtk_stack_add_titled(GTK_STACK(stack), welcome_page, "welcome", "Accueil");
     gtk_stack_add_titled(GTK_STACK(stack), editor_page, "editor", "Éditeur");
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "welcome");
 
+    g_signal_connect(window, "destroy", G_CALLBACK(cleanup_app_widgets), app_widgets);
     g_signal_connect(window, "destroy", G_CALLBACK(g_application_quit), app);
     gtk_widget_show_all(window);
+}
+
+static Hunhandle* create_hunspell_dictionary(const gchar *lang) {
+    gchar *aff_path;
+    gchar *dic_path;
+    Hunhandle *handle = NULL;
+
+    aff_path = g_strdup_printf("/usr/share/hunspell/%s.aff", lang);
+    dic_path = g_strdup_printf("/usr/share/hunspell/%s.dic", lang);
+
+    if (g_file_test(aff_path, G_FILE_TEST_IS_REGULAR) && g_file_test(dic_path, G_FILE_TEST_IS_REGULAR)) {
+        handle = Hunspell_create(aff_path, dic_path);
+        if (!handle) {
+            g_warning("Hunspell: impossible de charger %s / %s", aff_path, dic_path);
+        }
+    } else {
+        g_warning("Hunspell: dictionnaire introuvable %s / %s", aff_path, dic_path);
+    }
+
+    g_free(aff_path);
+    g_free(dic_path);
+    return handle;
 }
 
 static GtkWidget* create_welcome_page(AppWidgets *app_widgets) {
@@ -106,7 +129,7 @@ static GtkWidget* create_welcome_page(AppWidgets *app_widgets) {
     return box;
 }
 
-static GtkWidget* create_editor_page(void) {
+static GtkWidget* create_editor_page(AppWidgets *app_widgets) {
     GtkWidget *vbox;
     GtkWidget *hbox;
     GtkWidget *toolbar;
@@ -123,9 +146,11 @@ static GtkWidget* create_editor_page(void) {
     gtk_widget_set_halign(heading, GTK_ALIGN_START);
     gtk_widget_set_name(heading, "editor-heading");
 
-    toolbar = create_toolbar();
+    toolbar = create_toolbar(app_widgets);
     editor = create_editor();
+    app_widgets->editor_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor));
     sidebar = create_sidebar();
+    app_widgets->sidebar = sidebar;
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 14);
     gtk_box_pack_start(GTK_BOX(hbox), editor, TRUE, TRUE, 0);
@@ -136,6 +161,19 @@ static GtkWidget* create_editor_page(void) {
     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
     return vbox;
+}
+
+static void cleanup_app_widgets(GtkWidget *widget, gpointer data) {
+    AppWidgets *app_widgets = (AppWidgets *)data;
+    (void)widget;
+
+    if (app_widgets->hun_en) {
+        Hunspell_destroy(app_widgets->hun_en);
+    }
+    if (app_widgets->hun_fr) {
+        Hunspell_destroy(app_widgets->hun_fr);
+    }
+    g_free(app_widgets);
 }
 
 static void setup_css(void) {
