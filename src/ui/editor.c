@@ -16,6 +16,7 @@ GtkWidget* create_editor() {
 
     // Create the text editor view
     view = gtk_source_view_new_with_buffer(buffer);
+    gtk_widget_set_name(view, "editor-view");
 
     // Show line numbers on the left
     gtk_source_view_set_show_line_numbers(GTK_SOURCE_VIEW(view), TRUE);
