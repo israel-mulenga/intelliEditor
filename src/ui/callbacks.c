@@ -29,9 +29,9 @@ static gchar* check_spelling(AppWidgets *app_widgets) {
         return g_strdup("Erreur : éditeur non disponible.");
     }
 
-    gtk_text_buffer_get_start_iter(app_widgets->editor_buffer, &start);
-    gtk_text_buffer_get_end_iter(app_widgets->editor_buffer, &end);
-    text = gtk_text_buffer_get_text(app_widgets->editor_buffer, &start, &end, FALSE);
+    gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(app_widgets->editor_buffer), &start);
+    gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(app_widgets->editor_buffer), &end);
+    text = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(app_widgets->editor_buffer), &start, &end, FALSE);
     words = g_strsplit_set(text, separators, -1);
     result = g_string_new(NULL);
 

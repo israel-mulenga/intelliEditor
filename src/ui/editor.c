@@ -1,29 +1,30 @@
-#include "ui/editor.h"
-#include <gtk/gtk.h>
+#include "../../include/ui/editor.h"
 #include <gtksourceview/gtksource.h>
-// ======================================
-// MODULE: EDITOR
-// ROLE: Create the text editing area
-// ======================================
+#include "../../include/ui/window.h"
 
-GtkWidget* create_editor() {
+/* =========================================================
+   CRÉATION DE L'ÉDITEUR
+   Style Word-like (simple et propre)
+   ========================================================= */
+GtkWidget *create_editor(void) {
 
-    GtkSourceBuffer *buffer;
-    GtkWidget *view;
+    /* Buffer source view pour l'édition avec coloration syntaxe */
+    GtkSourceBuffer *buffer = gtk_source_buffer_new(NULL);
+    gtk_source_buffer_set_language(buffer, NULL); // Pas de coloration syntaxe pour le moment
 
-    // Create a text buffer (stores the text)
-    buffer = gtk_source_buffer_new(NULL);
+    /* Zone d'édition */
+    GtkWidget *view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(buffer));
+    gtk_widget_set_name(view, "editor-textview");
 
-    // Create the text editor view
-    view = gtk_source_view_new_with_buffer(buffer);
-    gtk_widget_set_name(view, "editor-view");
+    /* ================= STYLE WORD ================= */
 
-    // Show line numbers on the left
-    gtk_source_view_set_show_line_numbers(GTK_SOURCE_VIEW(view), TRUE);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
 
-    // Make the editor expand in the window
-    gtk_widget_set_hexpand(view, TRUE);
-    gtk_widget_set_vexpand(view, TRUE);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(view), 40);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(view), 40);
+
+    gtk_text_view_set_pixels_above_lines(GTK_TEXT_VIEW(view), 5);
+    gtk_text_view_set_pixels_below_lines(GTK_TEXT_VIEW(view), 5);
 
     return view;
 }

@@ -1,6 +1,6 @@
-#include "ui/window.h"
-#include "ui/toolbar.h"
-#include "ui/callbacks.h"
+#include "../../include/ui/toolbar.h"
+#include "../../include/ui/callbacks.h"
+#include "../../include/ui/window.h"
 
 // ======================================
 // MODULE: TOOLBAR
@@ -8,28 +8,14 @@
 // ======================================
 
 GtkWidget* create_toolbar(AppWidgets *app_widgets) {
+    GtkWidget *toolbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_widget_set_name(toolbar, "toolbar");
 
-    GtkWidget *box;
-    GtkWidget *btn_correct;
-    GtkWidget *btn_rewrite;
+    GtkWidget *btn = gtk_button_new_with_label("Correct");
+    gtk_widget_set_name(btn, "toolbar-button");
+    g_signal_connect(btn, "clicked", G_CALLBACK(on_correct_clicked), app_widgets);
 
-    // Horizontal container for the toolbar buttons
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_widget_set_name(box, "toolbar-box");
+    gtk_box_pack_start(GTK_BOX(toolbar), btn, FALSE, FALSE, 0);
 
-    // Create "Correct" button
-    btn_correct = gtk_button_new_with_label("Correct");
-    gtk_widget_set_name(btn_correct, "correct-button");
-    g_signal_connect(btn_correct, "clicked", G_CALLBACK(on_correct_clicked), app_widgets);
-
-    // Create "Rewrite" button
-    btn_rewrite = gtk_button_new_with_label("Rewrite");
-    gtk_widget_set_name(btn_rewrite, "rewrite-button");
-    g_signal_connect(btn_rewrite, "clicked", G_CALLBACK(on_rewrite_clicked), NULL);
-
-    // Add buttons to toolbar
-    gtk_box_pack_start(GTK_BOX(box), btn_correct, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), btn_rewrite, FALSE, FALSE, 0);
-
-    return box;
+    return toolbar;
 }
