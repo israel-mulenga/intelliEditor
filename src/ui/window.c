@@ -72,45 +72,71 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 }
 
 /* =========================================================
-   PAGE ÉDITEUR
+   PAGE ÉDITEUR (VERSION PROPRE WORD-LIKE)
    ========================================================= */
 GtkWidget* create_editor_page(AppWidgets *app_widgets) {
 
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    GtkWidget *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 
     /* ================= TOOLBAR ================= */
     GtkWidget *toolbar = create_toolbar(app_widgets);
+    gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+
+    /* ================= SCROLL (ZONE DOCUMENT) ================= */
+    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_name(scroll, "document-scroll");
+
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+        GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+    gtk_widget_set_hexpand(scroll, TRUE);
+    gtk_widget_set_vexpand(scroll, TRUE);
+
+    /* ================= CONTAINER CENTRÉ ================= */
+    GtkWidget *center_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_halign(center_box, GTK_ALIGN_CENTER);
+
+    /* ================= PAGE A4 ================= */
+    GtkWidget *page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_name(page, "a4-page");
+
+    /* Taille A4 réaliste */
+    gtk_widget_set_size_request(page, 794, 1123);
 
     /* ================= EDITOR ================= */
     GtkWidget *editor = create_editor();
+    gtk_widget_set_name(editor, "editor-textview");
 
-    // On récupère le buffer depuis le widget et on le stocke dans la structure
     app_widgets->editor_buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor))
     );
-    GtkWidget *sidebar = create_sidebar();
-    app_widgets->sidebar = sidebar;
+
+    /* Marges Word */
+    gtk_widget_set_margin_top(editor, 96);
+    gtk_widget_set_margin_bottom(editor, 96);
+    gtk_widget_set_margin_start(editor, 96);
+    gtk_widget_set_margin_end(editor, 96);
+
+    gtk_widget_set_hexpand(editor, TRUE);
+    gtk_widget_set_vexpand(editor, TRUE);
+
+    /* Assemblage */
+    gtk_box_pack_start(GTK_BOX(page), editor, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(center_box), page, FALSE, FALSE, 40);
+    gtk_container_add(GTK_CONTAINER(scroll), center_box);
+
+    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
 
     /* ================= STATUSBAR ================= */
     GtkWidget *statusbar = gtk_statusbar_new();
+    gtk_widget_set_name(statusbar, "statusbar");
+
     app_widgets->statusbar = statusbar;
 
-    /* ================= LAYOUT ================= */
-
-    gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
-
-    gtk_paned_pack1(GTK_PANED(paned), editor, TRUE, FALSE);
-    gtk_paned_pack2(GTK_PANED(paned), sidebar, FALSE, FALSE);
-
-    gtk_box_pack_start(GTK_BOX(vbox), paned, TRUE, TRUE, 0);
-
-    gtk_widget_set_name(statusbar, "statusbar");
     gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
 
     return vbox;
 }
-
 /* =========================================================
    CSS (STYLE GLOBAL)
    ========================================================= */
@@ -121,35 +147,66 @@ static void setup_css(void) {
     const gchar *css =
         /* ===== FENÊTRE ===== */
         "window#app-window {"
-        "    background-color: #ffffff;"
+        "    background-color: #e8e8e8;"
         "    color: #1e1e1e;"
-        "    font-family: 'Inter', 'Segoe UI', sans-serif;"
         "}"
 
-        /* ===== TOOLBAR SIMPLE ===== */
+        /* ===== TOOLBAR ===== */
         "#toolbar {"
         "    background-color: #f7f7f7;"
-        "    border-bottom: 1px solid #e6e6e6;"
-        "    padding: 10px;"
+        "    border-bottom: 1px solid #d0d0d0;"
+        "    padding: 8px 12px;"
+        "}"
+        
+        "button#toolbar-button {"
+        "    background-color: #f0f0f0;"
+        "    color: #1e1e1e;"
+        "    border: 1px solid #bfbfbf;"
+        "    border-radius: 3px;"
+        "    padding: 6px 12px;"
+        "    font-size: 13px;"
+        "}"
+        
+        "button#toolbar-button:hover {"
+        "    background-color: #e8e8e8;"
+        "    border: 1px solid #9e9e9e;"
         "}"
 
-        /* ===== ZONE D'ÉDITION (IMPORTANT) ===== */
+        /* ===== DOCUMENT CONTAINER (feuille) ===== */
+        "#a4-page {"
+        "    background-color: #ffffff;"
+        "    border: 1px solid #cfcfcf;"
+        "    box-shadow: 0 10px 30px rgba(0,0,0,0.15);"
+        "}"
+
+        /* ===== ZONE D'ÉDITION (FEUILLE) ===== */
         "#editor-textview {"
         "    background-color: #ffffff;"
         "    color: #1e1e1e;"
-        "    padding: 20px;"
+        "    padding: 0px;"
         "    border: none;"
+        "    font-family: 'Calibri', 'Arial', sans-serif;"
         "    font-size: 14px;"
+        "    line-height: 1.5;"
         "}"
 
         "textview text {"
         "    background-color: #ffffff;"
         "    color: #1e1e1e;"
-        "    selection-background-color: #cce5ff;"
-        "    selection-color: #000000;"
+        "    selection-background-color: #0078d4;"
+        "    selection-color: #ffffff;"
         "}"
 
-        /* ===== SIDEBAR SOBRE ===== */
+        /* ===== STATUSBAR ===== */
+        "#statusbar {"
+        "    background-color: #f0f0f0;"
+        "    color: #666666;"
+        "    border-top: 1px solid #d0d0d0;"
+        "    padding: 4px 8px;"
+        "    font-size: 12px;"
+        "}"
+
+        /* ===== SIDEBAR ===== */
         "#sidebar {"
         "    background-color: #f9f9f9;"
         "    border-left: 1px solid #eaeaea;"
@@ -159,7 +216,7 @@ static void setup_css(void) {
         /* ===== BOUTONS SIMPLES (STYLE ÉDITEUR) ===== */
         "button {"
         "    background-color: #ffffff;"
-        "    color: #1e1e1e;"
+        "    color: #6f51bb;"
         "    border: 1px solid #dcdcdc;"
         "    border-radius: 6px;"
         "    padding: 6px 12px;"
