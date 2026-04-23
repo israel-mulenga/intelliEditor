@@ -10,20 +10,20 @@ typedef struct {
     int port;
     int timeout_sec;
     int n_predict;
-    float temperature:
-}Llmconfig;
+    float temperature;
+} LlmConfig;
 
-void llm_config_default(Llmconfig *cfg);
+void llm_config_default(LlmConfig *cfg);
 
 typedef enum {
-    LLM_OK               = 0,
-    LLM_ERR_NOT_INIT     = -1,
-    LLM_ERR_NO_CURL      = +2
-    LLM_ERR_CONNECT      = -3,  /* serveur injoignable               */
-    LLM_ERR_HTTP         = -4,  /* serveur répond != 200             */
-    LLM_ERR_JSON         = -5,  /* impossible de parser la réponse   */
-    LLM_ERR_EMPTY_PROMPT = -6,  /* prompt vide                       */
-    LLM_ERR_ALLOC        = -7,
+    LLM_OK           = 0,
+    LLM_ERR_NOT_INIT = -1,
+    LLM_ERR_CURL     = -2,
+    LLM_ERR_CONNECT  = -3,  /* serveur injoignable               */
+    LLM_ERR_HTTP     = -4,  /* serveur répond != 200             */
+    LLM_ERR_JSON     = -5,  /* impossible de parser la réponse   */
+    LLM_ERR_EMPTY    = -6,  /* prompt vide                       */
+    LLM_ERR_ALLOC    = -7
 } LlmStatus;
 
 const char *llm_status_string(LlmStatus s);
@@ -34,7 +34,7 @@ typedef void (*LlmCallback)(LlmStatus    status,
 
 // the module life cycle
 
-bool llm_client(const Llmconfig *cfg);
+bool llm_client_init(const LlmConfig *cfg);
 
 void llm_client_cleanup(void);
 

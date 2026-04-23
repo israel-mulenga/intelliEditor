@@ -1,5 +1,5 @@
-#ifndef LL_PROMPTS_H
-#define LLM_PROMTS_H
+#ifndef LLM_PROMPTS_H
+#define LLM_PROMPTS_H
 
 // define the tokens for the llama
 /* this is the prompte format that the llama will undertand*/
@@ -81,3 +81,4 @@
         "Résume ce texte en 2-3 phrases :\n\"\"\"\n%s\n\"\"\"" \
     )
 
+#endif
