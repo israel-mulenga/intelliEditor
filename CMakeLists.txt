@@ -34,12 +34,3 @@ add_executable(test_gap_buffer
 # Pas besoin de GTK pour les tests unitaires du buffer, 
 # sauf si ton gap_buffer.h inclut des types GTK.
 
-
-# --- EXÉCUTABLE DE TESTS ---
-# On crée un binaire séparé pour les tests
-add_executable(test_gap_buffer 
-    tests/test_gap_buffer.c 
-    src/editor/gap_buffer.c
-)
-# Pas besoin de GTK pour les tests unitaires du buffer, 
-# sauf si ton gap_buffer.h inclut des types GTK.
