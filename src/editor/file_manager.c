@@ -1,15 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include "editor/gap_buffer.h"
+#include "editor/file_manager.h"
 
 GapBuffer* gap_buffer_load_from_file(const char *filename) {
-    FILE *file = fopen(filename, "r");
+    if (!filename) {
+        return NULL;
+    }
+
+    FILE *file = fopen(filename, "rb");
     if (!file) return NULL;
 
-    fseek(file, 0, SEEK_END);
+    if (fseek(file, 0, SEEK_END) != 0) {
+        fclose(file);
+        return NULL;
+    }
+
     long file_size = ftell(file);
+    if (file_size < 0) {
+        fclose(file);
+        return NULL;
+    }
+
     rewind(file);
 
     GapBuffer *gb = gap_buffer_create((size_t)file_size + 64); 
@@ -32,18 +44,31 @@ GapBuffer* gap_buffer_load_from_file(const char *filename) {
     return gb;
 }
 
-void gap_buffer_save_to_file(GapBuffer *gb, const char *filename) {
-    FILE *file = fopen(filename, "w");
-    if (!file) return;
+gboolean gap_buffer_save_to_file(const GapBuffer *gb, const char *filename) {
+    if (!gb || !filename) {
+        return FALSE;
+    }
+
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        return FALSE;
+    }
 
     if (gb->gap_start > 0) {
-        fwrite(gb->buffer, 1, gb->gap_start, file);
+        if (fwrite(gb->buffer, 1, gb->gap_start, file) != gb->gap_start) {
+            fclose(file);
+            return FALSE;
+        }
     }
 
     size_t suffix_len = gb->size - gb->gap_end;
     if (suffix_len > 0) {
-        fwrite(gb->buffer + gb->gap_end, 1, suffix_len, file);
+        if (fwrite(gb->buffer + gb->gap_end, 1, suffix_len, file) != suffix_len) {
+            fclose(file);
+            return FALSE;
+        }
     }
 
     fclose(file);
+    return TRUE;
 }

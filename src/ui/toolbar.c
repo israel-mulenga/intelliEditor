@@ -1,6 +1,6 @@
-#include "../../include/ui/toolbar.h"
-#include "../../include/ui/callbacks.h"
-#include "../../include/ui/window.h"
+#include "ui/toolbar.h"
+#include "ui/callbacks.h"
+#include "ui/window.h"
 
 // ======================================
 // MODULE: TOOLBAR
@@ -8,14 +8,22 @@
 // ======================================
 
 GtkWidget* create_toolbar(AppWidgets *app_widgets) {
-    GtkWidget *toolbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-    gtk_widget_set_name(toolbar, "toolbar");
+    GtkWidget *menu_bar = gtk_menu_bar_new();
+    gtk_widget_set_name(menu_bar, "toolbar");
 
-    GtkWidget *btn = gtk_button_new_with_label("Correct");
-    gtk_widget_set_name(btn, "toolbar-button");
-    g_signal_connect(btn, "clicked", G_CALLBACK(on_correct_clicked), app_widgets);
+    GtkWidget *file_item = gtk_menu_item_new_with_label("File");
+    GtkWidget *file_menu = gtk_menu_new();
+    GtkWidget *import_item = gtk_menu_item_new_with_label("Import...");
+    GtkWidget *save_item = gtk_menu_item_new_with_label("Save");
 
-    gtk_box_pack_start(GTK_BOX(toolbar), btn, FALSE, FALSE, 0);
+    g_signal_connect(import_item, "activate", G_CALLBACK(on_file_import_clicked), app_widgets);
+    g_signal_connect(save_item, "activate", G_CALLBACK(on_file_save_clicked), app_widgets);
 
-    return toolbar;
+    gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), import_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), save_item);
+
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file_item);
+
+    return menu_bar;
 }

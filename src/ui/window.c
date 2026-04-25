@@ -38,6 +38,7 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 
     /* ================= WINDOW ================= */
     window = gtk_application_window_new(app);
+    app_widgets->window = window;
     gtk_window_set_title(GTK_WINDOW(window), "IntelliEditor");
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 650);
     gtk_widget_set_name(window, "app-window");
@@ -107,15 +108,16 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets) {
 
     /* ================= EDITOR ================= */
     GtkWidget *editor = create_editor();
+    app_widgets->editor_view = editor;
     gtk_widget_set_name(editor, "editor-textview");
 
     app_widgets->editor_buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor))
     );
-    g_signal_connect(app_widgets->editor_buffer, "insert-text",
+    app_widgets->insert_handler_id = g_signal_connect(app_widgets->editor_buffer, "insert-text",
                     G_CALLBACK(on_text_inserted), app_widgets);
 
-    g_signal_connect(app_widgets->editor_buffer, "delete-range",
+    app_widgets->delete_handler_id = g_signal_connect(app_widgets->editor_buffer, "delete-range",
                     G_CALLBACK(on_text_deleted), app_widgets);
 
     /* Marges Word */
@@ -272,6 +274,12 @@ static void cleanup_app_widgets(GtkWidget *widget, gpointer data) {
     if (app->hun_fr) {
         Hunspell_destroy(app->hun_fr);
     }
+
+    if (app->gb) {
+        gap_buffer_destroy(app->gb);
+    }
+
+    g_free(app->current_file_path);
 
     g_free(app);
 }

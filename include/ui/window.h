@@ -8,21 +8,26 @@
 
 /* =========================================================
    STRUCTURE GLOBALE
-   Contient toutes les références partagées de l'application
+   Contient toutes les references partagees de l'application
    ========================================================= */
 typedef struct {
 
     GtkApplication *app;      // Application GTK principale
 
+    GtkWidget *window;        // Fenetre principale
     GtkWidget *stack;         // Gestion des pages (welcome / editor)
-    GtkWidget *sidebar;       // Panneau latéral
-    GtkWidget *statusbar;    // Barre de statut
+    GtkWidget *sidebar;       // Panneau lateral
+    GtkWidget *statusbar;     // Barre de statut
+    GtkWidget *editor_view;   // Vue d'edition
     GapBuffer *gb;
 
     GtkSourceBuffer *editor_buffer;
+    gulong insert_handler_id;
+    gulong delete_handler_id;
+    gchar *current_file_path;
 
-    Hunhandle *hun_en;        // dictionnaire anglais
-    Hunhandle *hun_fr;        // dictionnaire français
+    Hunhandle *hun_en;        // Dictionnaire anglais
+    Hunhandle *hun_fr;        // Dictionnaire francais
 
 } AppWidgets;
 

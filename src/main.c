@@ -11,7 +11,6 @@ int main(int argc, char *argv[]) {
     g_signal_connect(app, "activate", G_CALLBACK(create_main_window), gb);
     status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
-    gap_buffer_destroy(gb);
 
     return status;
 }

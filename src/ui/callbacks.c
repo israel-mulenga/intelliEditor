@@ -1,5 +1,6 @@
 #include "ui/callbacks.h"
 #include "ui/window.h"
+#include "editor/file_manager.h"
 #include <stdio.h>
 
 // ======================================
@@ -80,6 +81,35 @@ static void update_sidebar_text(AppWidgets *app_widgets, const gchar *text) {
     }
 }
 
+static void sync_editor_from_gap_buffer(AppWidgets *app_widgets) {
+    if (!app_widgets || !app_widgets->editor_buffer || !app_widgets->gb) {
+        return;
+    }
+
+    gchar *content = gap_buffer_get_content(app_widgets->gb);
+    if (!content) {
+        return;
+    }
+
+    if (app_widgets->insert_handler_id != 0) {
+        g_signal_handler_block(app_widgets->editor_buffer, app_widgets->insert_handler_id);
+    }
+    if (app_widgets->delete_handler_id != 0) {
+        g_signal_handler_block(app_widgets->editor_buffer, app_widgets->delete_handler_id);
+    }
+
+    gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app_widgets->editor_buffer), content, -1);
+
+    if (app_widgets->delete_handler_id != 0) {
+        g_signal_handler_unblock(app_widgets->editor_buffer, app_widgets->delete_handler_id);
+    }
+    if (app_widgets->insert_handler_id != 0) {
+        g_signal_handler_unblock(app_widgets->editor_buffer, app_widgets->insert_handler_id);
+    }
+
+    g_free(content);
+}
+
 // Called when "Correct" button is clicked
 void on_correct_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
@@ -108,6 +138,105 @@ void on_quit_clicked(GtkWidget *widget, gpointer data) {
     (void)data;
     GtkWidget *window = gtk_widget_get_toplevel(widget);
     gtk_widget_destroy(window);
+}
+
+void on_file_import_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (!app || !app->window) {
+        return;
+    }
+
+    GtkWidget *dialog = gtk_file_chooser_dialog_new(
+        "Import Text File",
+        GTK_WINDOW(app->window),
+        GTK_FILE_CHOOSER_ACTION_OPEN,
+        "_Cancel", GTK_RESPONSE_CANCEL,
+        "_Import", GTK_RESPONSE_ACCEPT,
+        NULL
+    );
+
+    GtkFileFilter *filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "Text files");
+    gtk_file_filter_add_mime_type(filter, "text/plain");
+    gtk_file_filter_add_pattern(filter, "*.txt");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+        gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        GapBuffer *loaded = gap_buffer_load_from_file(filename);
+
+        if (loaded) {
+            if (app->gb) {
+                gap_buffer_destroy(app->gb);
+            }
+            app->gb = loaded;
+
+            sync_editor_from_gap_buffer(app);
+
+            g_free(app->current_file_path);
+            app->current_file_path = g_strdup(filename);
+        } else {
+            g_printerr("Unable to import file: %s\n", filename);
+        }
+
+        g_free(filename);
+    }
+
+    gtk_widget_destroy(dialog);
+
+    if (app->editor_view) {
+        gtk_widget_grab_focus(app->editor_view);
+    }
+}
+
+void on_file_save_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (!app || !app->gb || !app->window) {
+        return;
+    }
+
+    gchar *filename = NULL;
+    gboolean should_free_filename = FALSE;
+
+    if (app->current_file_path) {
+        filename = app->current_file_path;
+    } else {
+        GtkWidget *dialog = gtk_file_chooser_dialog_new(
+            "Save Text File",
+            GTK_WINDOW(app->window),
+            GTK_FILE_CHOOSER_ACTION_SAVE,
+            "_Cancel", GTK_RESPONSE_CANCEL,
+            "_Save", GTK_RESPONSE_ACCEPT,
+            NULL
+        );
+
+        gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
+
+        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+            filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+            should_free_filename = TRUE;
+        }
+
+        gtk_widget_destroy(dialog);
+    }
+
+    if (!filename) {
+        return;
+    }
+
+    if (!gap_buffer_save_to_file(app->gb, filename)) {
+        g_printerr("Unable to save file: %s\n", filename);
+    } else if (!app->current_file_path) {
+        app->current_file_path = g_strdup(filename);
+    }
+
+    if (should_free_filename) {
+        g_free(filename);
+    }
 }
 
 void on_text_inserted(GtkTextBuffer *textbuffer, GtkTextIter *location,
