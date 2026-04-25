@@ -142,6 +142,8 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets) {
 
     gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
 
+    gtk_widget_grab_focus(editor);
+
     return vbox;
 }
 /* =========================================================
@@ -200,6 +202,7 @@ static void setup_css(void) {
         "textview text {"
         "    background-color: #ffffff;"
         "    color: #1e1e1e;"
+        "    caret-color: #111111;"
         "    selection-background-color: #0078d4;"
         "    selection-color: #ffffff;"
         "}"

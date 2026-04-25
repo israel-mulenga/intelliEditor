@@ -15,10 +15,13 @@ GtkWidget *create_editor(void) {
     /* Zone d'édition */
     GtkWidget *view = gtk_text_view_new_with_buffer(GTK_TEXT_BUFFER(buffer));
     gtk_widget_set_name(view, "editor-textview");
+    gtk_widget_set_can_focus(view, TRUE);
 
     /* ================= STYLE WORD ================= */
 
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
+    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(view), TRUE);
+    gtk_text_view_set_overwrite(GTK_TEXT_VIEW(view), FALSE);
 
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(view), 40);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(view), 40);
