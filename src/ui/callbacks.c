@@ -109,3 +109,45 @@ void on_quit_clicked(GtkWidget *widget, gpointer data) {
     GtkWidget *window = gtk_widget_get_toplevel(widget);
     gtk_widget_destroy(window);
 }
+
+void on_text_inserted(GtkTextBuffer *textbuffer, GtkTextIter *location,
+                      const gchar *text, gint len, gpointer data) {
+    (void)textbuffer;
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (!app || !app->gb || !location || !text || len <= 0) {
+        return;
+    }
+
+    gint offset = gtk_text_iter_get_offset(location);
+    gap_buffer_move_cursor(app->gb, (size_t)offset);
+
+    for (gint i = 0; i < len; i++) {
+        gap_buffer_insert(app->gb, text[i]);
+    }
+}
+
+
+void on_text_deleted(GtkTextBuffer *textbuffer, GtkTextIter *start, 
+                     GtkTextIter *end, gpointer data) {
+    (void)textbuffer;
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (!app || !app->gb || !start || !end) {
+        return;
+    }
+
+    gint start_offset = gtk_text_iter_get_offset(start);
+    gint end_offset = gtk_text_iter_get_offset(end);
+    gint len = end_offset - start_offset;
+
+    if (len <= 0) {
+        return;
+    }
+
+    gap_buffer_move_cursor(app->gb, (size_t)start_offset);
+
+    for (gint i = 0; i < len; i++) {
+        gap_buffer_delete(app->gb);
+    }
+}

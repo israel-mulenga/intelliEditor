@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
 #include <hunspell/hunspell.h>
+#include "editor/gap_buffer.h"
 
 /* =========================================================
    STRUCTURE GLOBALE
@@ -15,7 +16,8 @@ typedef struct {
 
     GtkWidget *stack;         // Gestion des pages (welcome / editor)
     GtkWidget *sidebar;       // Panneau latéral
-    GtkWidget *statusbar;     // Barre de statut
+    GtkWidget *statusbar;    // Barre de statut
+    GapBuffer *gb;
 
     GtkSourceBuffer *editor_buffer;
 

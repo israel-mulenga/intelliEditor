@@ -1,8 +1,9 @@
-#include "../../include/ui/window.h"
-#include "../../include/ui/editor.h"
-#include "../../include/ui/sidebar.h"
-#include "../../include/ui/toolbar.h"
-#include "../../include/ui/callbacks.h"
+#include "ui/window.h"
+#include "ui/editor.h"
+#include "ui/sidebar.h"
+#include "ui/toolbar.h"
+#include "ui/callbacks.h"
+#include "editor/gap_buffer.h"
 #include <hunspell/hunspell.h>
 
 /* =========================================================
@@ -17,7 +18,7 @@ static GtkWidget* create_editor_page(AppWidgets *app_widgets);
    FONCTION PRINCIPALE : création fenêtre
    ========================================================= */
 void create_main_window(GtkApplication *app, gpointer user_data) {
-    (void)user_data; // inutilisé
+    GapBuffer *gb = (GapBuffer *)user_data; 
 
     GtkWidget *window;
     GtkWidget *stack;
@@ -25,6 +26,7 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     /* Allocation structure globale */
     AppWidgets *app_widgets = g_new0(AppWidgets, 1);
 
+    app_widgets->gb = gb;
     app_widgets->app = app;
     app_widgets->hun_en = NULL;
     app_widgets->hun_fr = NULL;
@@ -110,6 +112,11 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets) {
     app_widgets->editor_buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor))
     );
+    g_signal_connect(app_widgets->editor_buffer, "insert-text",
+                    G_CALLBACK(on_text_inserted), app_widgets);
+
+    g_signal_connect(app_widgets->editor_buffer, "delete-range",
+                    G_CALLBACK(on_text_deleted), app_widgets);
 
     /* Marges Word */
     gtk_widget_set_margin_top(editor, 96);

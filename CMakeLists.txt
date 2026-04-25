@@ -19,11 +19,21 @@ link_directories(${GTK3_LIBRARY_DIRS} ${GTKSOURCEVIEW_LIBRARY_DIRS} ${HUNSPELL_L
 add_definitions(${GTK3_CFLAGS_OTHER} ${GTKSOURCEVIEW_CFLAGS_OTHER} ${HUNSPELL_CFLAGS_OTHER})
 
 # --- EXÉCUTABLE PRINCIPAL ---
-add_executable(IntelliEditor src/main.c src/ui/window.c src/ui/editor.c src/ui/sidebar.c src/ui/toolbar.c src/ui/callbacks.c src/editor/gap_buffer.c src/editor/file_manager.c) et Hunspell
-target_link_libraries(IntelliEditor ${GTK3_LIBRARIES} ${GTKSOURCEVIEW_LIBRARIES} ${HUNSPELL_LIBRARIES})
-# --- EXÉCUTABLE PRINCIPAL ---
-add_executable(IntelliEditor src/main.c src/editor/gap_buffer.c src/editor/file_manager.c)
-target_link_libraries(IntelliEditor ${GTK3_LIBRARIES})
+add_executable(IntelliEditor
+    src/main.c 
+    src/ui/window.c 
+    src/ui/editor.c 
+    src/ui/sidebar.c 
+    src/ui/toolbar.c 
+    src/ui/callbacks.c 
+    src/editor/gap_buffer.c 
+    src/editor/file_manager.c)
+    
+target_link_libraries(IntelliEditor 
+    ${GTK3_LIBRARIES} 
+    ${GTKSOURCEVIEW_LIBRARIES} 
+    ${HUNSPELL_LIBRARIES}
+)
 
 # --- EXÉCUTABLE DE TESTS ---
 # On crée un binaire séparé pour les tests
