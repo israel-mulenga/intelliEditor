@@ -145,99 +145,93 @@ static void setup_css(void) {
     GtkCssProvider *provider = gtk_css_provider_new();
 
     const gchar *css =
-        /* ===== FENÊTRE ===== */
-        "window#app-window {"
-        "    background-color: #e8e8e8;"
-        "    color: #1e1e1e;"
-        "}"
 
-        /* ===== TOOLBAR ===== */
-        "#toolbar {"
-        "    background-color: #f7f7f7;"
-        "    border-bottom: 1px solid #d0d0d0;"
-        "    padding: 8px 12px;"
-        "}"
-        
-        "button#toolbar-button {"
-        "    background-color: #f0f0f0;"
-        "    color: #1e1e1e;"
-        "    border: 1px solid #bfbfbf;"
-        "    border-radius: 3px;"
-        "    padding: 6px 12px;"
-        "    font-size: 13px;"
-        "}"
-        
-        "button#toolbar-button:hover {"
-        "    background-color: #e8e8e8;"
-        "    border: 1px solid #9e9e9e;"
-        "}"
+            /* ===== FENÊTRE ===== */
+            "window#app-window {"
+            "    background-color: #e6eaf0;"
+            "    color: #1f2937;"
+            "}"
 
-        /* ===== DOCUMENT CONTAINER (feuille) ===== */
-        "#a4-page {"
-        "    background-color: #ffffff;"
-        "    border: 1px solid #cfcfcf;"
-        "    box-shadow: 0 10px 30px rgba(0,0,0,0.15);"
-        "}"
+            /* ===== TOOLBAR ===== */
+            "#toolbar {"
+            "    background-color: #1e3a8a;"
+            "    border-bottom: 1px solid #1a2f6b;"
+            "    padding: 8px 12px;"
+            "}"
 
-        /* ===== ZONE D'ÉDITION (FEUILLE) ===== */
-        "#editor-textview {"
-        "    background-color: #ffffff;"
-        "    color: #1e1e1e;"
-        "    padding: 0px;"
-        "    border: none;"
-        "    font-family: 'Calibri', 'Arial', sans-serif;"
-        "    font-size: 14px;"
-        "    line-height: 1.5;"
-        "}"
+            /* ===== BOUTONS TOOLBAR ===== */
+            "button#toolbar-button {"
+            "    background-color: transparent;"
+            "    color: #ffffff;"
+            "    border: 1px solid transparent;"
+            "    border-radius: 4px;"
+            "    padding: 6px 12px;"
+            "    font-weight: 500;"
+            "}"
 
-        "textview text {"
-        "    background-color: #ffffff;"
-        "    color: #1e1e1e;"
-        "    selection-background-color: #0078d4;"
-        "    selection-color: #ffffff;"
-        "}"
+            "button#toolbar-button:hover {"
+            "    background-color: #2563eb;"
+            "}"
 
-        /* ===== STATUSBAR ===== */
-        "#statusbar {"
-        "    background-color: #f0f0f0;"
-        "    color: #666666;"
-        "    border-top: 1px solid #d0d0d0;"
-        "    padding: 4px 8px;"
-        "    font-size: 12px;"
-        "}"
+            /* ===== PAGE A4 ===== */
+            "#a4-page {"
+            "    background-color: #ffffff;"
+            "    border: 1px solid #d1d5db;"
+            "    box-shadow: 0 12px 30px rgba(0,0,0,0.15);"
+            "}"
 
-        /* ===== SIDEBAR ===== */
-        "#sidebar {"
-        "    background-color: #f9f9f9;"
-        "    border-left: 1px solid #eaeaea;"
-        "    padding: 12px;"
-        "}"
+            /* ===== ÉDITEUR ===== */
+            "#editor-textview {"
+            "    background-color: #ffffff;"
+            "    color: #1f2937;"
+            "    border: none;"
+            "    font-family: 'Calibri', 'Segoe UI', sans-serif;"
+            "    font-size: 15px;"
+            "    line-height: 1.6;"
+            "}"
 
-        /* ===== BOUTONS SIMPLES (STYLE ÉDITEUR) ===== */
-        "button {"
-        "    background-color: #ffffff;"
-        "    color: #6f51bb;"
-        "    border: 1px solid #dcdcdc;"
-        "    border-radius: 6px;"
-        "    padding: 6px 12px;"
-        "}"
+            /* ===== TEXTE INTERNE ===== */
+            "textview text {"
+            "    background-color: #ffffff;"
+            "    color: #1f2937;"
+            "    selection-background-color: #2563eb;"
+            "    selection-color: #ffffff;"
+            "}"
 
-        "button:hover {"
-        "    background-color: #f0f0f0;"
-        "}"
+            /* ===== SCROLLBAR ===== */
+            "scrollbar slider {"
+            "    background: #c7d2fe;"
+            "    border-radius: 8px;"
+            "}"
 
-        "button:active {"
-        "    background-color: #e6e6e6;"
-        "}"
+            /* ===== SIDEBAR ===== */
+            "#sidebar {"
+            "    background-color: #f1f5f9;"
+            "    border-left: 1px solid #d1d5db;"
+            "    padding: 12px;"
+            "}"
 
-        /* ===== STATUS BAR ===== */
-        "statusbar#statusbar {"
-        "    background-color: #f7f7f7;"
-        "    color: #666666;"
-        "    border-top: 1px solid #e6e6e6;"
-        "    padding: 6px 10px;"
-        "    font-size: 12px;"
-        "}";
+            /* ===== BOUTONS GÉNÉRAUX ===== */
+            "button {"
+            "    background-color: #ffffff;"
+            "    color: #1e3a8a;"
+            "    border: 1px solid #c7d2fe;"
+            "    border-radius: 6px;"
+            "    padding: 6px 12px;"
+            "}"
+
+            "button:hover {"
+            "    background-color: #eef2ff;"
+            "}"
+
+            /* ===== STATUS BAR ===== */
+            "#statusbar {"
+            "    background-color: #1e3a8a;"
+            "    color: #ffffff;"
+            "    border-top: 1px solid #1a2f6b;"
+            "    padding: 6px 10px;"
+            "    font-size: 12px;"
+            "}";
 
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
 
