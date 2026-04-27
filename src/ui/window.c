@@ -145,7 +145,6 @@ static void setup_css(void) {
     GtkCssProvider *provider = gtk_css_provider_new();
 
     const gchar *css =
-
             /* ===== FENÊTRE ===== */
             "window#app-window {"
             "    background-color: #e6eaf0;"
