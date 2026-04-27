@@ -110,6 +110,47 @@ static void sync_editor_from_gap_buffer(AppWidgets *app_widgets) {
     g_free(content);
 }
 
+static gchar *prompt_save_filename(AppWidgets *app) {
+    GtkWidget *dialog = gtk_file_chooser_dialog_new(
+        "Save Text File",
+        GTK_WINDOW(app->window),
+        GTK_FILE_CHOOSER_ACTION_SAVE,
+        "_Cancel", GTK_RESPONSE_CANCEL,
+        "_Save", GTK_RESPONSE_ACCEPT,
+        NULL
+    );
+
+    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
+
+    if (app->current_file_path) {
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), app->current_file_path);
+    }
+
+    gchar *filename = NULL;
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+        filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    }
+
+    gtk_widget_destroy(dialog);
+    return filename;
+}
+
+static void save_to_path(AppWidgets *app, const gchar *filename, gboolean update_current_path) {
+    if (!filename) {
+        return;
+    }
+
+    if (!gap_buffer_save_to_file(app->gb, filename)) {
+        g_printerr("Unable to save file: %s\n", filename);
+        return;
+    }
+
+    if (update_current_path) {
+        g_free(app->current_file_path);
+        app->current_file_path = g_strdup(filename);
+    }
+}
+
 // Called when "Correct" button is clicked
 void on_correct_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
@@ -199,44 +240,26 @@ void on_file_save_clicked(GtkWidget *widget, gpointer data) {
         return;
     }
 
-    gchar *filename = NULL;
-    gboolean should_free_filename = FALSE;
-
     if (app->current_file_path) {
-        filename = app->current_file_path;
+        save_to_path(app, app->current_file_path, FALSE);
     } else {
-        GtkWidget *dialog = gtk_file_chooser_dialog_new(
-            "Save Text File",
-            GTK_WINDOW(app->window),
-            GTK_FILE_CHOOSER_ACTION_SAVE,
-            "_Cancel", GTK_RESPONSE_CANCEL,
-            "_Save", GTK_RESPONSE_ACCEPT,
-            NULL
-        );
-
-        gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
-
-        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-            filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-            should_free_filename = TRUE;
-        }
-
-        gtk_widget_destroy(dialog);
+        gchar *filename = prompt_save_filename(app);
+        save_to_path(app, filename, filename != NULL);
+        g_free(filename);
     }
+}
 
-    if (!filename) {
+void on_file_save_as_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (!app || !app->gb || !app->window) {
         return;
     }
 
-    if (!gap_buffer_save_to_file(app->gb, filename)) {
-        g_printerr("Unable to save file: %s\n", filename);
-    } else if (!app->current_file_path) {
-        app->current_file_path = g_strdup(filename);
-    }
-
-    if (should_free_filename) {
-        g_free(filename);
-    }
+    gchar *filename = prompt_save_filename(app);
+    save_to_path(app, filename, filename != NULL);
+    g_free(filename);
 }
 
 void on_text_inserted(GtkTextBuffer *textbuffer, GtkTextIter *location,
