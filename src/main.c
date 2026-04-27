@@ -1,14 +1,16 @@
 #include <gtk/gtk.h>
+#include "../include/ui/window.h"
+#include "editor/gap_buffer.h"
 
 int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
+    GtkApplication *app;
+    int status;
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "IntelliEditor - Phase 1");
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    GapBuffer *gb = gap_buffer_create(1024);
+    app = gtk_application_new("com.example.intellieditor", G_APPLICATION_DEFAULT_FLAGS); // DEFAULT NONE IS DEPRECIATED
+    g_signal_connect(app, "activate", G_CALLBACK(create_main_window), gb);
+    status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
 
-    gtk_widget_show_all(window);
-    gtk_main();
-
-    return 0;
+    return status;
 }
