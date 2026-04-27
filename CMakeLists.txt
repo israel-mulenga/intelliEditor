@@ -2,19 +2,69 @@ cmake_minimum_required(VERSION 3.10)
 project(IntelliEditor C)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 set(CMAKE_C_STANDARD 11)
 
-# Recherche des bibliothèques nécessaires (GTK3 pour Linux)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+pkg_check_modules(GTKSOURCEVIEW REQUIRED gtksourceview-4)
+pkg_check_modules(HUNSPELL REQUIRED hunspell)
+pkg_check_modules(CURL REQUIRED libcurl)
 
-# Inclusion des dossiers
-include_directories(include ${GTK3_INCLUDE_DIRS})
-link_directories(${GTK3_LIBRARY_DIRS})
+include_directories(
+    include
+    src
+    deps/cjson
+    ${GTK3_INCLUDE_DIRS}
+    ${GTKSOURCEVIEW_INCLUDE_DIRS}
+    ${HUNSPELL_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
+)
 
-# Définition de l'exécutable
-add_executable(IntelliEditor src/main.c)
+link_directories(
+    ${GTK3_LIBRARY_DIRS}
+    ${GTKSOURCEVIEW_LIBRARY_DIRS}
+    ${HUNSPELL_LIBRARY_DIRS}
+    ${CURL_LIBRARY_DIRS}
+)
 
-# Liaison avec GTK3
-target_link_libraries(IntelliEditor ${GTK3_LIBRARIES})
+add_definitions(
+    ${GTK3_CFLAGS_OTHER}
+    ${GTKSOURCEVIEW_CFLAGS_OTHER}
+    ${HUNSPELL_CFLAGS_OTHER}
+    ${CURL_CFLAGS_OTHER}
+)
+
+add_executable(IntelliEditor
+    src/main.c
+    src/ui/window.c
+    src/ui/editor.c
+    src/ui/sidebar.c
+    src/ui/toolbar.c
+    src/ui/callbacks.c
+    src/editor/gap_buffer.c
+    src/editor/file_manager.c
+)
+
+target_link_libraries(IntelliEditor
+    ${GTK3_LIBRARIES}
+    ${GTKSOURCEVIEW_LIBRARIES}
+    ${HUNSPELL_LIBRARIES}
+)
+
+add_library(rules_engine STATIC
+    src/checkers.c
+    src/parser.c
+    deps/cjson/cJSON.c
+)
+
+target_include_directories(rules_engine PUBLIC
+    src
+    deps/cjson
+)
+
+target_link_libraries(rules_engine m)
+
+add_executable(test_gap_buffer
+    tests/test_gap_buffer.c
+    src/editor/gap_buffer.c
+)
