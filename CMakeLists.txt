@@ -52,13 +52,13 @@ target_link_libraries(IntelliEditor
 )
 
 add_library(rules_engine STATIC
-    src/checkers.c
-    src/parser.c
+    src/rules/checkers.c
+    src/rules/parser.c
     deps/cjson/cJSON.c
 )
 
 target_include_directories(rules_engine PUBLIC
-    src
+    include
     deps/cjson
 )
 

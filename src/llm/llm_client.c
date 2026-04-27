@@ -1,5 +1,5 @@
-#include "llm_client.h"
-#include "llm_prompts.h"
+#include "llm/llm_client.h"
+#include "llm/llm_prompts.h"
 #include "../../deps/cjson/cJSON.h"
 
 #include <curl/curl.h>  

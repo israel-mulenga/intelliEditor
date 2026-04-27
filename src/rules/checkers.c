@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
-#include "rules.h"
+#include "rules/rules.h"
 
 /* * count_words : Parcourt le texte caractère par caractère.
  * Un mot est détecté quand on passe d'un espace à un caractère visible.

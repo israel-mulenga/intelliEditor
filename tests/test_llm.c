@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <glib.h>
-#include "../src/llm/llm_client.h"
+#include "llm/llm_client.h"
 
 
 /* Couleurs pour l'affichage */
