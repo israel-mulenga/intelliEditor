@@ -1,10 +1,11 @@
+#include <stdlib.h>
 #include "editor/gap_buffer.h"
 
 GapBuffer* gap_buffer_create(size_t initial_capacity) {
-    GapBuffer *gb = malloc(sizeof(GapBuffer));
+    GapBuffer *gb = (GapBuffer *)malloc(sizeof *gb);
     if (!gb) return NULL;
 
-    gb->buffer = malloc(initial_capacity);
+    gb->buffer = (char *)malloc(initial_capacity);
     if (!gb->buffer) {
         free(gb);
         return NULL;
@@ -45,7 +46,7 @@ GapBuffer* gap_buffer_resize(GapBuffer *gb) {
     size_t old_size = gb->size;
     size_t new_size = old_size * 2;
     
-    char *new_buffer = malloc(new_size);
+    char *new_buffer = (char *)malloc(new_size);
     if (!new_buffer) return NULL; 
 
     size_t prefix_len = gb->gap_start; 
@@ -83,7 +84,7 @@ char* gap_buffer_get_content(GapBuffer *gb) {
     size_t suffix_len = gb->size - gb->gap_end;
     size_t text_length = prefix_len + suffix_len;
 
-    char *text = malloc(text_length + 1);
+    char *text = (char *)malloc(text_length + 1);
     if (!text) return NULL;
 
     memcpy(text, gb->buffer, prefix_len);
