@@ -66,8 +66,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_box_pack_start(GTK_BOX(undo_box), undo_image, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(undo_box), undo_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(undo_item), undo_box);
-    // TODO: ajouter le callback d'undo quand la fonction existe
-    // g_signal_connect(undo_item, "activate", G_CALLBACK(on_edit_undo_clicked), app_widgets);
+    g_signal_connect(undo_item, "activate", G_CALLBACK(on_edit_undo_clicked), app_widgets); // Connecte le signal d'activation au callback undo
 
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), undo_item);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);

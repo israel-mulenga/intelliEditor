@@ -303,3 +303,14 @@ void on_text_deleted(GtkTextBuffer *textbuffer, GtkTextIter *start,
         gap_buffer_delete(app->gb);
     }
 }
+
+void on_edit_undo_clicked(GtkWidget *widget, gpointer data) {
+    AppWidgets *app = (AppWidgets *)data;
+    gap_buffer_undo(app->gb); // Restaure l'état précédent du buffer
+    // Met à jour l'affichage dans l'éditeur GTK
+    char *content = gap_buffer_get_content(app->gb);
+    if (content) {
+        gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app->editor_buffer), content, -1);
+        free(content);
+    }
+}
