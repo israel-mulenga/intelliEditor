@@ -69,6 +69,18 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     g_signal_connect(undo_item, "activate", G_CALLBACK(on_edit_undo_clicked), app_widgets); // Connecte le signal d'activation au callback undo
 
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), undo_item);
+
+    // Créer l'élément "Redo" avec icône
+    GtkWidget *redo_item = gtk_menu_item_new();
+    GtkWidget *redo_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);  // Boîte horizontale avec espacement
+    GtkWidget *redo_image = gtk_image_new_from_icon_name("edit-redo", GTK_ICON_SIZE_MENU);
+    GtkWidget *redo_label = gtk_label_new("Redo");
+    gtk_box_pack_start(GTK_BOX(redo_box), redo_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(redo_box), redo_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(redo_item), redo_box);
+    g_signal_connect(redo_item, "activate", G_CALLBACK(on_edit_redo_clicked), app_widgets);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), redo_item);
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
 

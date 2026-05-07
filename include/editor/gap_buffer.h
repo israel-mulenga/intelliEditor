@@ -20,6 +20,7 @@ typedef struct {
     size_t gap_end;     
     size_t size;
     HistoryNode *history; // Pile des états précédents pour undo
+    HistoryNode *redo;    // Pile des états possibles pour redo
 } GapBuffer;
 
 typedef struct {
@@ -40,4 +41,5 @@ CursorPos gap_buffer_get_cursor_pos(GapBuffer *gb);
 void gap_buffer_set_cursor_pos(GapBuffer *gb, int x, int y);
 void gap_buffer_push_history(GapBuffer *gb); // Sauvegarde l'état actuel dans l'historique
 void gap_buffer_undo(GapBuffer *gb); // Restaure l'état précédent depuis l'historique
+void gap_buffer_redo(GapBuffer *gb); // Restaure l'état suivant depuis l'historique redo
 #endif 

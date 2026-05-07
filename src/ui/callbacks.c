@@ -315,3 +315,14 @@ void on_edit_undo_clicked(GtkWidget *widget, gpointer data) {
         free(content);
     }
 }
+
+void on_edit_redo_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    gap_buffer_redo(app->gb); // Restaure l'état suivant du buffer
+    char *content = gap_buffer_get_content(app->gb);
+    if (content) {
+        gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app->editor_buffer), content, -1);
+        free(content);
+    }
+}

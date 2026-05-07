@@ -12,6 +12,7 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data);
 void on_file_save_clicked(GtkWidget *widget, gpointer data);
 void on_file_save_as_clicked(GtkWidget *widget, gpointer data);
 void on_edit_undo_clicked(GtkWidget *widget, gpointer data); // Callback pour le bouton Undo dans le menu Edit
+void on_edit_redo_clicked(GtkWidget *widget, gpointer data); // Callback pour le bouton Redo dans le menu Edit
 void on_text_inserted(GtkTextBuffer *textbuffer, GtkTextIter *location, 
                       const gchar *text, gint len, gpointer data);
 

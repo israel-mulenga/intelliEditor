@@ -15,6 +15,7 @@ GapBuffer* gap_buffer_create(size_t initial_capacity) {
     gb->gap_start = 0;
     gb->gap_end = initial_capacity;
     gb->history = NULL;
+    gb->redo = NULL;
 
     return gb;
 }
@@ -40,12 +41,20 @@ void gap_buffer_move_cursor(GapBuffer *gb, size_t new_position) {
 
 void gap_buffer_destroy(GapBuffer *gb){
     free(gb->buffer);
-    // Libère toute la pile d'historique
+    // Libère toute la pile d'historique undo
     HistoryNode *node = gb->history;
     while (node) {
         HistoryNode *next = node->next;
         free(node->buffer); // Libère la copie du buffer
         free(node);         // Libère le nœud
+        node = next;
+    }
+    // Libère toute la pile d'historique redo
+    node = gb->redo;
+    while (node) {
+        HistoryNode *next = node->next;
+        free(node->buffer);
+        free(node);
         node = next;
     }
     free(gb);
@@ -176,8 +185,39 @@ void gap_buffer_set_cursor_pos(GapBuffer *gb, int x, int y) {
     gap_buffer_move_cursor(gb, logical_pos);
 }
 
+static void gap_buffer_clear_redo(GapBuffer *gb) {
+    HistoryNode *node = gb->redo;
+    while (node) {
+        HistoryNode *next = node->next;
+        free(node->buffer);
+        free(node);
+        node = next;
+    }
+    gb->redo = NULL;
+}
+
+static void gap_buffer_push_redo_history(GapBuffer *gb) {
+    HistoryNode *node = (HistoryNode *)malloc(sizeof(HistoryNode));
+    if (!node) return;
+
+    node->buffer = (char *)malloc(gb->size);
+    if (!node->buffer) {
+        free(node);
+        return;
+    }
+    memcpy(node->buffer, gb->buffer, gb->size);
+    node->gap_start = gb->gap_start;
+    node->gap_end = gb->gap_end;
+    node->size = gb->size;
+    node->next = gb->redo;
+    gb->redo = node;
+}
+
 void gap_buffer_push_history(GapBuffer *gb) {
-    // Crée un nouveau nœud d'historique
+    // Toute nouvelle action invalide la pile redo
+    gap_buffer_clear_redo(gb);
+
+    // Crée un nouveau nœud d'historique undo
     HistoryNode *node = (HistoryNode *)malloc(sizeof(HistoryNode));
     if (!node) return; // Échec d'allocation
 
@@ -194,7 +234,7 @@ void gap_buffer_push_history(GapBuffer *gb) {
     node->gap_end = gb->gap_end;
     node->size = gb->size;
 
-    // Ajoute en tête de la pile
+    // Ajoute en tête de la pile undo
     node->next = gb->history;
     gb->history = node;
 }
@@ -202,7 +242,10 @@ void gap_buffer_push_history(GapBuffer *gb) {
 void gap_buffer_undo(GapBuffer *gb) {
     if (!gb->history) return; // Pas d'historique à restaurer
 
-    // Récupère le dernier état sauvegardé
+    // Sauvegarde l'état courant pour redo
+    gap_buffer_push_redo_history(gb);
+
+    // Récupère le dernier état sauvegardé dans undo
     HistoryNode *node = gb->history;
     gb->history = node->next;
 
@@ -213,6 +256,38 @@ void gap_buffer_undo(GapBuffer *gb) {
     gb->gap_end = node->gap_end;
     gb->size = node->size;
 
-    // Libère le nœud
+    // Libère le nœud undo
     free(node);
+}
+
+void gap_buffer_redo(GapBuffer *gb) {
+    if (!gb->redo) return; // Pas d'état redo disponible
+
+    // Sauvegarde l'état courant dans undo
+    HistoryNode *node = (HistoryNode *)malloc(sizeof(HistoryNode));
+    if (!node) return;
+
+    node->buffer = (char *)malloc(gb->size);
+    if (!node->buffer) {
+        free(node);
+        return;
+    }
+    memcpy(node->buffer, gb->buffer, gb->size);
+    node->gap_start = gb->gap_start;
+    node->gap_end = gb->gap_end;
+    node->size = gb->size;
+    node->next = gb->history;
+    gb->history = node;
+
+    // Récupère l'état suivant dans redo
+    HistoryNode *redo_node = gb->redo;
+    gb->redo = redo_node->next;
+
+    free(gb->buffer);
+    gb->buffer = redo_node->buffer;
+    gb->gap_start = redo_node->gap_start;
+    gb->gap_end = redo_node->gap_end;
+    gb->size = redo_node->size;
+
+    free(redo_node);
 }
