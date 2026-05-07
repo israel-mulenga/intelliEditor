@@ -112,6 +112,8 @@ static char *build_json(const char *prompt) {
         cJSON_AddItemToArray(stop_arr, cJSON_CreateString(LLM_STOP_2));
     }
 
+    cJSON_AddFalseToObject(root, "cache_prompt");
+
     char *json_str = cJSON_PrintUnformatted(root);
     cJSON_Delete(root);
     return json_str;    
