@@ -54,8 +54,22 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file_item);
 
+    // Créer un item Edit au menu
     GtkWidget *edit_item = gtk_menu_item_new_with_label("Edit");
     GtkWidget *edit_menu = gtk_menu_new();
+    
+     // Créer l'élément "Undo" avec icône
+    GtkWidget *undo_item = gtk_menu_item_new();
+    GtkWidget *undo_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);  // Boîte horizontale avec espacement
+    GtkWidget *undo_image = gtk_image_new_from_icon_name("edit-undo", GTK_ICON_SIZE_MENU);  // Icône
+    GtkWidget *undo_label = gtk_label_new("Undo");
+    gtk_box_pack_start(GTK_BOX(undo_box), undo_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(undo_box), undo_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(undo_item), undo_box);
+    // TODO: ajouter le callback d'undo quand la fonction existe
+    // g_signal_connect(undo_item, "activate", G_CALLBACK(on_edit_undo_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), undo_item);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
 
