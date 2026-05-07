@@ -305,6 +305,7 @@ void on_text_deleted(GtkTextBuffer *textbuffer, GtkTextIter *start,
 }
 
 void on_edit_undo_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget; // GTK passe le widget clique, mais on ne l'utilise pas ici
     AppWidgets *app = (AppWidgets *)data;
     gap_buffer_undo(app->gb); // Restaure l'état précédent du buffer
     // Met à jour l'affichage dans l'éditeur GTK
