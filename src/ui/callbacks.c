@@ -307,6 +307,11 @@ void on_text_deleted(GtkTextBuffer *textbuffer, GtkTextIter *start,
 void on_edit_undo_clicked(GtkWidget *widget, gpointer data) {
     (void)widget; // GTK passe le widget clique, mais on ne l'utilise pas ici
     AppWidgets *app = (AppWidgets *)data;
+    
+    // Déconnecte temporairement les gestionnaires pour éviter les boucles
+    g_signal_handler_disconnect(app->editor_buffer, app->insert_handler_id);
+    g_signal_handler_disconnect(app->editor_buffer, app->delete_handler_id);
+    
     gap_buffer_undo(app->gb); // Restaure l'état précédent du buffer
     // Met à jour l'affichage dans l'éditeur GTK
     char *content = gap_buffer_get_content(app->gb);
@@ -314,17 +319,34 @@ void on_edit_undo_clicked(GtkWidget *widget, gpointer data) {
         gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app->editor_buffer), content, -1);
         free(content);
     }
+    
+    // Reconnecte les gestionnaires
+    app->insert_handler_id = g_signal_connect(app->editor_buffer, "insert-text",
+                    G_CALLBACK(on_text_inserted), app);
+    app->delete_handler_id = g_signal_connect(app->editor_buffer, "delete-range",
+                    G_CALLBACK(on_text_deleted), app);
 }
 
 void on_edit_redo_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
     AppWidgets *app = (AppWidgets *)data;
+    
+    // Déconnecte temporairement les gestionnaires pour éviter les boucles
+    g_signal_handler_disconnect(app->editor_buffer, app->insert_handler_id);
+    g_signal_handler_disconnect(app->editor_buffer, app->delete_handler_id);
+    
     gap_buffer_redo(app->gb); // Restaure l'état suivant du buffer
     char *content = gap_buffer_get_content(app->gb);
     if (content) {
         gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app->editor_buffer), content, -1);
         free(content);
     }
+    
+    // Reconnecte les gestionnaires
+    app->insert_handler_id = g_signal_connect(app->editor_buffer, "insert-text",
+                    G_CALLBACK(on_text_inserted), app);
+    app->delete_handler_id = g_signal_connect(app->editor_buffer, "delete-range",
+                    G_CALLBACK(on_text_deleted), app);
 }
 
 void on_edit_select_all_clicked(GtkWidget *widget, gpointer data) {
