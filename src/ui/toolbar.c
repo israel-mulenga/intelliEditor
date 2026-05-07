@@ -61,6 +61,11 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file_item);
 
+
+
+
+
+
     // Créer un item Edit au menu
     GtkWidget *edit_item = gtk_menu_item_new_with_label("Edit");
     GtkWidget *edit_menu = gtk_menu_new();
@@ -94,6 +99,63 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
+
+
+
+
+
+     // Créer un item View au menu
+    GtkWidget *view_item = gtk_menu_item_new_with_label("View");
+    GtkWidget *view_menu = gtk_menu_new();
+
+
+
+
+
+     // Créer un item Insert au menu
+    GtkWidget *insert_item = gtk_menu_item_new_with_label("Insert");
+    GtkWidget *insert_menu = gtk_menu_new();
+
+
+
+
+
+     // Créer un item Format au menu
+    GtkWidget *format_item = gtk_menu_item_new_with_label("Formatt");
+    GtkWidget *format_menu = gtk_menu_new();
+
+
+
+
+
+     // Créer un item Tools au menu
+    GtkWidget *tools_item = gtk_menu_item_new_with_label("Tools");
+    GtkWidget *tools_menu = gtk_menu_new();
+
+
+
+
+
+     // Créer un item Table au menu
+    GtkWidget *Table_item = gtk_menu_item_new_with_label("Table");
+    GtkWidget *Tablee_menu = gtk_menu_new();
+
+
+
+
+
+     // Créer un item Window au menu
+    GtkWidget *window_item = gtk_menu_item_new_with_label("Window");
+    GtkWidget *window_menu = gtk_menu_new();
+
+
+
+
+
+     // Créer un item Help au menu
+    GtkWidget *help_item = gtk_menu_item_new_with_label("Help");
+    GtkWidget *help_menu = gtk_menu_new();
+
 
     return menu_bar;
 }
