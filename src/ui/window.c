@@ -12,7 +12,7 @@
 static void setup_css(void);
 static void init_hunspell(AppWidgets *app_widgets);
 static void cleanup_app_widgets(GtkWidget *widget, gpointer data);
-static GtkWidget* create_editor_page(AppWidgets *app_widgets);
+static GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_group);
 
 /* =========================================================
    FONCTION PRINCIPALE : création fenêtre
@@ -22,6 +22,7 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 
     GtkWidget *window;
     GtkWidget *stack;
+    GtkAccelGroup *accel_group;
 
     /* Allocation structure globale */
     AppWidgets *app_widgets = g_new0(AppWidgets, 1);
@@ -43,6 +44,9 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 650);
     gtk_widget_set_name(window, "app-window");
 
+    accel_group = gtk_accel_group_new();
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
     /* ================= STACK (pages) ================= */
     stack = gtk_stack_new();
     gtk_container_add(GTK_CONTAINER(window), stack);
@@ -62,7 +66,7 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     gtk_box_pack_start(GTK_BOX(welcome_box), open_button, FALSE, FALSE, 0);
 
     gtk_stack_add_named(GTK_STACK(stack), welcome_box, "welcome");
-    gtk_stack_add_named(GTK_STACK(stack), create_editor_page(app_widgets), "editor");
+    gtk_stack_add_named(GTK_STACK(stack), create_editor_page(app_widgets, accel_group), "editor");
 
     gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "welcome");
@@ -77,12 +81,12 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 /* =========================================================
    PAGE ÉDITEUR (VERSION PROPRE WORD-LIKE)
    ========================================================= */
-GtkWidget* create_editor_page(AppWidgets *app_widgets) {
+GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
 
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     /* ================= TOOLBAR ================= */
-    GtkWidget *toolbar = create_toolbar(app_widgets);
+    GtkWidget *toolbar = create_toolbar(app_widgets, accel_group);
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
 
     /* ================= SCROLL (ZONE DOCUMENT) ================= */

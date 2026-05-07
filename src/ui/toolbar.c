@@ -2,13 +2,14 @@
 #include "ui/callbacks.h"
 #include "ui/window.h"
 #include "llm/llm_bridge.h"
+#include <gdk/gdkkeysyms.h>
 
 // ======================================
 // MODULE: TOOLBAR
 // ROLE: Create action buttons with icons
 // ======================================
 
-GtkWidget* create_toolbar(AppWidgets *app_widgets) {
+GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     GtkWidget *menu_bar = gtk_menu_bar_new();
     gtk_widget_set_name(menu_bar, "toolbar");
 
@@ -25,6 +26,8 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_box_pack_start(GTK_BOX(import_box), import_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(import_item), import_box);
     g_signal_connect(import_item, "activate", G_CALLBACK(on_file_import_clicked), app_widgets);
+    gtk_widget_add_accelerator(import_item, "activate", accel_group,
+                               GDK_KEY_o, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     // Créer l'élément "Save" avec icône
     GtkWidget *save_item = gtk_menu_item_new();
@@ -35,6 +38,8 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_box_pack_start(GTK_BOX(save_box), save_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(save_item), save_box);
     g_signal_connect(save_item, "activate", G_CALLBACK(on_file_save_clicked), app_widgets);
+    gtk_widget_add_accelerator(save_item, "activate", accel_group,
+                               GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     // Créer l'élément "Save As" avec icône
     GtkWidget *save_as_item = gtk_menu_item_new();
@@ -45,6 +50,8 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_box_pack_start(GTK_BOX(save_as_box), save_as_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(save_as_item), save_as_box);
     g_signal_connect(save_as_item, "activate", G_CALLBACK(on_file_save_as_clicked), app_widgets);
+    gtk_widget_add_accelerator(save_as_item, "activate", accel_group,
+                               GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
 
     // Ajouter les éléments au menu
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), import_item);
@@ -67,6 +74,8 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_box_pack_start(GTK_BOX(undo_box), undo_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(undo_item), undo_box);
     g_signal_connect(undo_item, "activate", G_CALLBACK(on_edit_undo_clicked), app_widgets); // Connecte le signal d'activation au callback undo
+    gtk_widget_add_accelerator(undo_item, "activate", accel_group,
+                               GDK_KEY_z, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), undo_item);
 
@@ -79,6 +88,8 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     gtk_box_pack_start(GTK_BOX(redo_box), redo_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(redo_item), redo_box);
     g_signal_connect(redo_item, "activate", G_CALLBACK(on_edit_redo_clicked), app_widgets);
+    gtk_widget_add_accelerator(redo_item, "activate", accel_group,
+                               GDK_KEY_y, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), redo_item);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);

@@ -36,7 +36,7 @@ typedef struct {
    ========================================================= */
 void create_main_window(GtkApplication *app, gpointer user_data);
 
-GtkWidget *create_toolbar(AppWidgets *app);
+GtkWidget *create_toolbar(AppWidgets *app, GtkAccelGroup *accel_group);
 GtkWidget *create_editor(void);
 GtkWidget *create_sidebar(void);
 
