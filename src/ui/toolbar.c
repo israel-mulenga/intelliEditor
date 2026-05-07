@@ -12,6 +12,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
     GtkWidget *menu_bar = gtk_menu_bar_new();
     gtk_widget_set_name(menu_bar, "toolbar");
 
+    // Créer un item File au menu
     GtkWidget *file_item = gtk_menu_item_new_with_label("File");
     GtkWidget *file_menu = gtk_menu_new();
 
@@ -52,6 +53,11 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets) {
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file_item);
+
+    GtkWidget *edit_item = gtk_menu_item_new_with_label("Edit");
+    GtkWidget *edit_menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
 
     return menu_bar;
 }
