@@ -1,6 +1,7 @@
 #include "ui/toolbar.h"
 #include "ui/callbacks.h"
 #include "ui/window.h"
+#include "llm/llm_bridge.h"
 
 // ======================================
 // MODULE: TOOLBAR
