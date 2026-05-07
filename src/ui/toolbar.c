@@ -26,8 +26,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_box_pack_start(GTK_BOX(import_box), import_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(import_item), import_box);
     g_signal_connect(import_item, "activate", G_CALLBACK(on_file_import_clicked), app_widgets);
-    gtk_widget_add_accelerator(import_item, "activate", accel_group,
-                               GDK_KEY_o, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(import_item, "activate", accel_group, GDK_KEY_o, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     // Créer l'élément "Save" avec icône
     GtkWidget *save_item = gtk_menu_item_new();
@@ -38,8 +37,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_box_pack_start(GTK_BOX(save_box), save_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(save_item), save_box);
     g_signal_connect(save_item, "activate", G_CALLBACK(on_file_save_clicked), app_widgets);
-    gtk_widget_add_accelerator(save_item, "activate", accel_group,
-                               GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(save_item, "activate", accel_group, GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     // Créer l'élément "Save As" avec icône
     GtkWidget *save_as_item = gtk_menu_item_new();
@@ -50,8 +48,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_box_pack_start(GTK_BOX(save_as_box), save_as_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(save_as_item), save_as_box);
     g_signal_connect(save_as_item, "activate", G_CALLBACK(on_file_save_as_clicked), app_widgets);
-    gtk_widget_add_accelerator(save_as_item, "activate", accel_group,
-                               GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(save_as_item, "activate", accel_group, GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
 
     // Ajouter les éléments au menu
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), import_item);
@@ -79,8 +76,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_box_pack_start(GTK_BOX(undo_box), undo_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(undo_item), undo_box);
     g_signal_connect(undo_item, "activate", G_CALLBACK(on_edit_undo_clicked), app_widgets); // Connecte le signal d'activation au callback undo
-    gtk_widget_add_accelerator(undo_item, "activate", accel_group,
-                               GDK_KEY_z, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(undo_item, "activate", accel_group, GDK_KEY_z, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), undo_item);
 
@@ -93,13 +89,85 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_box_pack_start(GTK_BOX(redo_box), redo_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(redo_item), redo_box);
     g_signal_connect(redo_item, "activate", G_CALLBACK(on_edit_redo_clicked), app_widgets);
-    gtk_widget_add_accelerator(redo_item, "activate", accel_group,
-                               GDK_KEY_y, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(redo_item, "activate", accel_group, GDK_KEY_y, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), redo_item);
+
+
+     // Créer l'élément "Cut" avec icône
+    GtkWidget *cut_item = gtk_menu_item_new();
+    GtkWidget *cut_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *cut_image = gtk_image_new_from_icon_name("edit-cut", GTK_ICON_SIZE_MENU); // Corrigé ici
+    GtkWidget *cut_label = gtk_label_new("Cut");
+    gtk_box_pack_start(GTK_BOX(cut_box), cut_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(cut_box), cut_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(cut_item), cut_box);
+    g_signal_connect(cut_item, "activate", G_CALLBACK(on_edit_cut_clicked), app_widgets);
+    gtk_widget_add_accelerator(cut_item, "activate", accel_group, GDK_KEY_x, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), cut_item);
+
+
+     // Créer l'élément "Copy" avec icône
+    GtkWidget *copy_item = gtk_menu_item_new();
+    GtkWidget *copy_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *copy_image = gtk_image_new_from_icon_name("edit-copy", GTK_ICON_SIZE_MENU);
+    GtkWidget *copy_label = gtk_label_new("Copy");
+    
+    gtk_box_pack_start(GTK_BOX(copy_box), copy_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(copy_box), copy_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(copy_item), copy_box);
+    
+    g_signal_connect(copy_item, "activate", G_CALLBACK(on_edit_copy_clicked), app_widgets);
+    gtk_widget_add_accelerator(copy_item, "activate", accel_group, GDK_KEY_c, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), copy_item);
+
+    
+
+     // Créer l'élément "Paste" avec icône
+    GtkWidget *paste_item = gtk_menu_item_new();
+    GtkWidget *paste_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *paste_image = gtk_image_new_from_icon_name("edit-paste", GTK_ICON_SIZE_MENU);
+    GtkWidget *paste_label = gtk_label_new("Paste");
+    
+    gtk_box_pack_start(GTK_BOX(paste_box), paste_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(paste_box), paste_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(paste_item), paste_box);
+    
+    g_signal_connect(paste_item, "activate", G_CALLBACK(on_edit_paste_clicked), app_widgets);
+    gtk_widget_add_accelerator(paste_item, "activate", accel_group, GDK_KEY_v, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), paste_item);
+
+
+     // Créer l'élément "Select All" avec icône
+    GtkWidget *selectall_item = gtk_menu_item_new();
+    GtkWidget *selectall_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *selectall_image = gtk_image_new_from_icon_name("edit-select-all", GTK_ICON_SIZE_MENU);
+    GtkWidget *selectall_label = gtk_label_new("Select All");
+    
+    gtk_box_pack_start(GTK_BOX(selectall_box), selectall_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(selectall_box), selectall_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(selectall_item), selectall_box);
+    
+    g_signal_connect(selectall_item, "activate", G_CALLBACK(on_edit_select_all_clicked), app_widgets);
+    gtk_widget_add_accelerator(selectall_item, "activate", accel_group, GDK_KEY_a, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), selectall_item);
+
+
+   // Créer l'élément "Find" avec icône
+    GtkWidget *find_item = gtk_menu_item_new();
+    GtkWidget *find_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *find_image = gtk_image_new_from_icon_name("edit-find", GTK_ICON_SIZE_MENU);
+    GtkWidget *find_label = gtk_label_new("Find...");
+    
+    gtk_box_pack_start(GTK_BOX(find_box), find_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(find_box), find_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(find_item), find_box);
+    
+    g_signal_connect(find_item, "activate", G_CALLBACK(on_edit_find_clicked), app_widgets);
+    gtk_widget_add_accelerator(find_item, "activate", accel_group, GDK_KEY_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), find_item);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
-
 
 
 

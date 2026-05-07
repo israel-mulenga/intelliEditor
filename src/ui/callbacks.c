@@ -326,3 +326,49 @@ void on_edit_redo_clicked(GtkWidget *widget, gpointer data) {
         free(content);
     }
 }
+
+void on_edit_select_all_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        GtkTextIter start, end;
+        gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(app->editor_buffer), &start);
+        gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(app->editor_buffer), &end);
+        gtk_text_buffer_select_range(GTK_TEXT_BUFFER(app->editor_buffer), &start, &end);
+    }
+}
+
+void on_edit_cut_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        gtk_text_buffer_cut_clipboard(GTK_TEXT_BUFFER(app->editor_buffer), gtk_clipboard_get(GDK_SELECTION_CLIPBOARD), TRUE);
+    }
+}
+
+void on_edit_copy_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        gtk_text_buffer_copy_clipboard(GTK_TEXT_BUFFER(app->editor_buffer), gtk_clipboard_get(GDK_SELECTION_CLIPBOARD));
+    }
+}
+
+void on_edit_paste_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        gtk_text_buffer_paste_clipboard(GTK_TEXT_BUFFER(app->editor_buffer), gtk_clipboard_get(GDK_SELECTION_CLIPBOARD), NULL, TRUE);
+    }
+}
+
+void on_edit_find_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    // For now, just show a message. In a full implementation, open a find dialog.
+    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(app->window),
+        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+        "Find functionality not yet implemented.");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
