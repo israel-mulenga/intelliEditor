@@ -11,7 +11,7 @@ Les fichiers suivants sont disponibles dans `src/llm/` :
 
 ### 1. Inclure le bridge
 
-Dans ton fichier de toolbar ou de callbacks UI :
+Dans ton fichier de toolbar ou de callbacks UI : C'EST FAIT
 
 ```c
 #include "llm/llm_bridge.h"
