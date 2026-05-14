@@ -13,6 +13,11 @@ static void setup_css(void);
 static void init_hunspell(AppWidgets *app_widgets);
 static void cleanup_app_widgets(GtkWidget *widget, gpointer data);
 static GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_group);
+static gboolean draw_horizontal_ruler(
+    GtkWidget *widget,
+    cairo_t *cr,
+    gpointer data
+);
 
 /* =========================================================
    FONCTION PRINCIPALE : création fenêtre
@@ -111,16 +116,28 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     gtk_widget_set_size_request(page, 794, 1123);
 
     /* ================= RULERS ================= */
-    GtkWidget *horizontal_ruler = gtk_event_box_new();
+   /* ================= HORIZONTAL RULER ================= */
+    GtkWidget *horizontal_ruler = gtk_drawing_area_new();
     gtk_widget_set_name(horizontal_ruler, "horizontal-ruler");
-    gtk_widget_set_size_request(horizontal_ruler, -1, 20);
+    gtk_widget_set_size_request(horizontal_ruler, -1, 30);
+
+    /* signal pour dessiner la règle */
+    g_signal_connect(horizontal_ruler,
+                    "draw",
+                    G_CALLBACK(draw_horizontal_ruler),
+                    NULL);
+
     gtk_widget_set_no_show_all(horizontal_ruler, TRUE);
     gtk_widget_hide(horizontal_ruler);
+
     app_widgets->horizontal_ruler = horizontal_ruler;
 
-    GtkWidget *ruler_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start(GTK_BOX(ruler_row), horizontal_ruler, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(page), ruler_row, FALSE, FALSE, 0);
+    /* placer juste sous le menu */
+    gtk_box_pack_start(GTK_BOX(vbox),
+                    horizontal_ruler,
+                    FALSE,
+                    FALSE,
+                    0);
 
     /* ================= EDITOR ================= */
     GtkWidget *editor = create_editor();
@@ -286,7 +303,14 @@ static void setup_css(void) {
         "    border-top: 1px solid #e6e6e6;"
         "    padding: 6px 10px;"
         "    font-size: 12px;"
+        "}"
+        
+        /* ===== HORIZON RULEr ===== */
+        "#horizontal-ruler {"
+        "   background-color: #f8fafc;"
+        "   border-bottom: 1px solid #cbd5e1;"
         "}";
+        
 
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
 
@@ -333,4 +357,63 @@ static void init_hunspell(AppWidgets *app_widgets) {
     if (g_file_test(fr_aff, G_FILE_TEST_EXISTS) && g_file_test(fr_dic, G_FILE_TEST_EXISTS)) {
         app_widgets->hun_fr = Hunspell_create(fr_aff, fr_dic);
     }
+}
+
+static gboolean draw_horizontal_ruler(
+    GtkWidget *widget,
+    cairo_t *cr,
+    gpointer data)
+{
+    (void)data;
+
+    GtkAllocation alloc;
+    gtk_widget_get_allocation(widget, &alloc);
+
+    int width = alloc.width;
+    int height = alloc.height;
+
+    /* fond */
+    cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
+    cairo_paint(cr);
+
+    /* couleur des traits */
+    cairo_set_source_rgb(cr, 0.15, 0.15, 0.15);
+
+    cairo_set_line_width(cr, 1);
+
+    int cm_spacing = 50;
+
+    for (int i = 0; i < width; i += 10)
+    {
+        int line_height = 8;
+
+        /* grande graduation */
+        if (i % cm_spacing == 0)
+            line_height = 22;
+
+        /* moyenne graduation */
+        else if (i % 20 == 0)
+            line_height = 15;
+
+        cairo_move_to(cr, i, height);
+        cairo_line_to(cr, i, height - line_height);
+
+        cairo_stroke(cr);
+
+        /* numéros */
+        if (i % cm_spacing == 0)
+        {
+            char number[10];
+
+            sprintf(number, "%d", i / cm_spacing);
+
+            cairo_move_to(cr, i + 2, 12);
+
+            cairo_set_font_size(cr, 11);
+
+            cairo_show_text(cr, number);
+        }
+    }
+
+    return FALSE;
 }
