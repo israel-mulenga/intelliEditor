@@ -107,8 +107,20 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     GtkWidget *page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_name(page, "a4-page");
 
-    /* Taille A4 réaliste */
+    /* Taille fixe A4 : 794x1123 pixels à 96 DPI */
     gtk_widget_set_size_request(page, 794, 1123);
+
+    /* ================= RULERS ================= */
+    GtkWidget *horizontal_ruler = gtk_event_box_new();
+    gtk_widget_set_name(horizontal_ruler, "horizontal-ruler");
+    gtk_widget_set_size_request(horizontal_ruler, -1, 20);
+    gtk_widget_set_no_show_all(horizontal_ruler, TRUE);
+    gtk_widget_hide(horizontal_ruler);
+    app_widgets->horizontal_ruler = horizontal_ruler;
+
+    GtkWidget *ruler_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(ruler_row), horizontal_ruler, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(page), ruler_row, FALSE, FALSE, 0);
 
     /* ================= EDITOR ================= */
     GtkWidget *editor = create_editor();
@@ -118,6 +130,18 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     app_widgets->editor_buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor))
     );
+
+    GtkWidget *vertical_ruler = gtk_event_box_new();
+    gtk_widget_set_name(vertical_ruler, "vertical-ruler");
+    gtk_widget_set_size_request(vertical_ruler, 20, -1);
+    gtk_widget_set_no_show_all(vertical_ruler, TRUE);
+    gtk_widget_hide(vertical_ruler);
+    app_widgets->vertical_ruler = vertical_ruler;
+
+    GtkWidget *editor_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(editor_row), vertical_ruler, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(editor_row), editor, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(page), editor_row, TRUE, TRUE, 0);
     app_widgets->insert_handler_id = g_signal_connect(app_widgets->editor_buffer, "insert-text",
                     G_CALLBACK(on_text_inserted), app_widgets);
 
@@ -134,7 +158,6 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     gtk_widget_set_vexpand(editor, TRUE);
 
     /* Assemblage */
-    gtk_box_pack_start(GTK_BOX(page), editor, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(center_box), page, FALSE, FALSE, 40);
     gtk_container_add(GTK_CONTAINER(scroll), center_box);
 
@@ -211,6 +234,16 @@ static void setup_css(void) {
         "    caret-color: #111111;"
         "    selection-background-color: #0078d4;"
         "    selection-color: #ffffff;"
+        "}"
+
+        "#horizontal-ruler {"
+        "    background-color: #f3f3f3;"
+        "    border-bottom: 1px solid #cdcdcd;"
+        "}"
+
+        "#vertical-ruler {"
+        "    background-color: #f3f3f3;"
+        "    border-right: 1px solid #cdcdcd;"
         "}"
 
         /* ===== STATUSBAR ===== */

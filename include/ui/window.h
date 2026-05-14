@@ -19,6 +19,8 @@ typedef struct {
     GtkWidget *sidebar;       // Panneau lateral
     GtkWidget *statusbar;     // Barre de statut
     GtkWidget *editor_view;   // Vue d'edition
+    GtkWidget *horizontal_ruler;
+    GtkWidget *vertical_ruler;
     GapBuffer *gb;
 
     GtkSourceBuffer *editor_buffer;

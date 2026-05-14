@@ -232,6 +232,18 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data) {
     }
 }
 
+void on_file_new_page_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (!app || !app->editor_buffer) return;
+
+    GtkTextIter iter;
+    gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(app->editor_buffer), &iter);
+
+    gtk_text_buffer_insert(GTK_TEXT_BUFFER(app->editor_buffer), &iter, "\n\n", -1);
+}
+
 void on_file_save_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
     AppWidgets *app = (AppWidgets *)data;
@@ -393,4 +405,30 @@ void on_edit_find_clicked(GtkWidget *widget, gpointer data) {
         "Find functionality not yet implemented.");
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
+}
+
+void on_view_toggle_horizontal_ruler_clicked(GtkWidget *widget, gpointer data) {
+    AppWidgets *app = (AppWidgets *)data;
+    gboolean active = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    if (!app || !app->horizontal_ruler) {
+        return;
+    }
+    if (active) {
+        gtk_widget_show(app->horizontal_ruler);
+    } else {
+        gtk_widget_hide(app->horizontal_ruler);
+    }
+}
+
+void on_view_toggle_vertical_ruler_clicked(GtkWidget *widget, gpointer data) {
+    AppWidgets *app = (AppWidgets *)data;
+    gboolean active = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    if (!app || !app->vertical_ruler) {
+        return;
+    }
+    if (active) {
+        gtk_widget_show(app->vertical_ruler);
+    } else {
+        gtk_widget_hide(app->vertical_ruler);
+    }
 }

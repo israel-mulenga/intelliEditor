@@ -2,6 +2,7 @@
 #include "ui/callbacks.h"
 #include "ui/window.h"
 #include "llm/llm_bridge.h"
+#include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
 // ======================================
@@ -48,10 +49,41 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     gtk_box_pack_start(GTK_BOX(save_as_box), save_as_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(save_as_item), save_as_box);
     g_signal_connect(save_as_item, "activate", G_CALLBACK(on_file_save_as_clicked), app_widgets);
-    gtk_widget_add_accelerator(save_as_item, "activate", accel_group, GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
+
+    GdkModifierType modifiers;
+    /* =========================================================
+   RACCOURCI CLAVIER : CTRL + SHIFT + S
+   Permet d'ouvrir "Save As..."
+   
+   GDK_CONTROL_MASK = touche Ctrl
+   GDK_SHIFT_MASK   = touche Shift
+
+   Le cast (GdkModifierType) est nécessaire
+   car l'opérateur "|" retourne un int.
+   ========================================================= */
+    gtk_widget_add_accelerator(
+    save_as_item,
+    "activate",
+    accel_group,
+    GDK_KEY_s,
+    (GdkModifierType)(GDK_CONTROL_MASK | GDK_SHIFT_MASK),
+    GTK_ACCEL_VISIBLE
+    );
+
+    // Créer l'élément "New Page" avec icône
+    GtkWidget *new_page_item = gtk_menu_item_new();
+    GtkWidget *new_page_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *new_page_image = gtk_image_new_from_icon_name("document-new", GTK_ICON_SIZE_MENU);
+    GtkWidget *new_page_label = gtk_label_new("New Page");
+    gtk_box_pack_start(GTK_BOX(new_page_box), new_page_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(new_page_box), new_page_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(new_page_item), new_page_box);
+    g_signal_connect(new_page_item, "activate", G_CALLBACK(on_file_new_page_clicked), app_widgets);
+    gtk_widget_add_accelerator(new_page_item, "activate", accel_group, GDK_KEY_n, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
 
     // Ajouter les éléments au menu
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), import_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), new_page_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), save_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), save_as_item);
 
@@ -176,6 +208,16 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     GtkWidget *view_item = gtk_menu_item_new_with_label("View");
     GtkWidget *view_menu = gtk_menu_new();
 
+    GtkWidget *horizontal_ruler_item = gtk_check_menu_item_new_with_label("Horizontal Ruler");
+    g_signal_connect(horizontal_ruler_item, "toggled",
+        G_CALLBACK(on_view_toggle_horizontal_ruler_clicked), app_widgets);
+    gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), horizontal_ruler_item);
+
+    GtkWidget *vertical_ruler_item = gtk_check_menu_item_new_with_label("Vertical Ruler");
+    g_signal_connect(vertical_ruler_item, "toggled",
+        G_CALLBACK(on_view_toggle_vertical_ruler_clicked), app_widgets);
+    gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), vertical_ruler_item);
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view_item), view_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view_item);
 
@@ -195,7 +237,7 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
 
 
      // Créer un item Format au menu
-    GtkWidget *format_item = gtk_menu_item_new_with_label("Formatt");
+    GtkWidget *format_item = gtk_menu_item_new_with_label("Format");
     GtkWidget *format_menu = gtk_menu_new();
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(format_item), format_menu);
