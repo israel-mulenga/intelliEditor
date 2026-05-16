@@ -41,6 +41,8 @@ add_executable(IntelliEditor
     src/ui/sidebar.c
     src/ui/toolbar.c
     src/ui/callbacks.c
+    src/llm/llm_client.c
+    src/llm/llm_bridge.c
     src/editor/gap_buffer.c
     src/editor/file_manager.c
 )
@@ -49,6 +51,8 @@ target_link_libraries(IntelliEditor
     ${GTK3_LIBRARIES}
     ${GTKSOURCEVIEW_LIBRARIES}
     ${HUNSPELL_LIBRARIES}
+    ${CURL_LIBRARIES}
+    rules_engine
 )
 
 add_library(rules_engine STATIC

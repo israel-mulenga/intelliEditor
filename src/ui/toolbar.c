@@ -73,17 +73,29 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     // Créer l'élément "New Page" avec icône
     GtkWidget *new_page_item = gtk_menu_item_new();
     GtkWidget *new_page_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    GtkWidget *new_page_image = gtk_image_new_from_icon_name("document-new", GTK_ICON_SIZE_MENU);
+    GtkWidget *new_page_image = gtk_image_new_from_icon_name("view-paged", GTK_ICON_SIZE_MENU);
     GtkWidget *new_page_label = gtk_label_new("New Page");
     gtk_box_pack_start(GTK_BOX(new_page_box), new_page_image, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(new_page_box), new_page_label, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(new_page_item), new_page_box);
     g_signal_connect(new_page_item, "activate", G_CALLBACK(on_file_new_page_clicked), app_widgets);
-    gtk_widget_add_accelerator(new_page_item, "activate", accel_group, GDK_KEY_n, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(new_page_item, "activate", accel_group, GDK_KEY_p, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
+
+    // Créer l'élément "New Document" avec icône
+    GtkWidget *new_document_item = gtk_menu_item_new();
+    GtkWidget *new_document_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *new_document_image = gtk_image_new_from_icon_name("document-new", GTK_ICON_SIZE_MENU);
+    GtkWidget *new_document_label = gtk_label_new("New Document");
+    gtk_box_pack_start(GTK_BOX(new_document_box), new_document_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(new_document_box), new_document_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(new_document_item), new_document_box);
+    g_signal_connect(new_document_item, "activate", G_CALLBACK(on_file_new_document_clicked), app_widgets);
+    gtk_widget_add_accelerator(new_document_item, "activate", accel_group, GDK_KEY_n, GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
 
     // Ajouter les éléments au menu
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), import_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), new_page_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), new_document_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), save_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), save_as_item);
 
@@ -197,6 +209,30 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     g_signal_connect(find_item, "activate", G_CALLBACK(on_edit_find_clicked), app_widgets);
     gtk_widget_add_accelerator(find_item, "activate", accel_group, GDK_KEY_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), find_item);
+
+    // Créer l'élément "Rephrase" (LLM) avec icône
+    GtkWidget *rephrase_item = gtk_menu_item_new();
+    GtkWidget *rephrase_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *rephrase_image = gtk_image_new_from_icon_name("document-revert-symbolic", GTK_ICON_SIZE_MENU);
+    GtkWidget *rephrase_label = gtk_label_new("Rephrase");
+    gtk_box_pack_start(GTK_BOX(rephrase_box), rephrase_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rephrase_box), rephrase_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(rephrase_item), rephrase_box);
+    g_signal_connect(rephrase_item, "activate", G_CALLBACK(on_llm_rewrite_clicked), app_widgets);
+    gtk_widget_add_accelerator(rephrase_item, "activate", accel_group, GDK_KEY_r, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), rephrase_item);
+
+    // Créer l'élément "Grammar Check" (LLM) avec icône
+    GtkWidget *grammar_item = gtk_menu_item_new();
+    GtkWidget *grammar_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    GtkWidget *grammar_image = gtk_image_new_from_icon_name("document-properties-symbolic", GTK_ICON_SIZE_MENU);
+    GtkWidget *grammar_label = gtk_label_new("Grammar Check");
+    gtk_box_pack_start(GTK_BOX(grammar_box), grammar_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(grammar_box), grammar_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(grammar_item), grammar_box);
+    g_signal_connect(grammar_item, "activate", G_CALLBACK(on_llm_grammar_clicked), app_widgets);
+    gtk_widget_add_accelerator(grammar_item, "activate", accel_group, GDK_KEY_g, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), grammar_item);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);

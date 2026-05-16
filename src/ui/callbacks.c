@@ -1,6 +1,7 @@
 #include "ui/callbacks.h"
 #include "ui/window.h"
 #include "editor/file_manager.h"
+#include "llm/llm_bridge.h"
 #include <stdio.h>
 
 // ======================================
@@ -167,6 +168,34 @@ void on_rewrite_clicked(GtkWidget *widget, gpointer data) {
     printf("Rewrite button clicked\n");
 }
 
+// Wrapper to call LLM bridge rephrase using current app widgets
+void on_llm_rewrite_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app_widgets = (AppWidgets *)data;
+    if (!app_widgets) return;
+
+    AppContext ctx;
+    ctx.source_view = GTK_SOURCE_VIEW(app_widgets->editor_view);
+    ctx.statusbar = app_widgets->statusbar;
+    ctx.sidebar = app_widgets->sidebar;
+
+    llm_bridge_on_write_clicked(widget, &ctx);
+}
+
+// Wrapper to call LLM bridge grammar check using current app widgets
+void on_llm_grammar_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app_widgets = (AppWidgets *)data;
+    if (!app_widgets) return;
+
+    AppContext ctx;
+    ctx.source_view = GTK_SOURCE_VIEW(app_widgets->editor_view);
+    ctx.statusbar = app_widgets->statusbar;
+    ctx.sidebar = app_widgets->sidebar;
+
+    llm_bridge_on_gramma_clicked(widget, &ctx);
+}
+
 // Called when the welcome screen "Ouvrir l'éditeur" button is clicked
 void on_start_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
@@ -232,17 +261,6 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data) {
     }
 }
 
-void on_file_new_page_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget;
-    AppWidgets *app = (AppWidgets *)data;
-
-    if (!app || !app->editor_buffer) return;
-
-    GtkTextIter iter;
-    gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(app->editor_buffer), &iter);
-
-    gtk_text_buffer_insert(GTK_TEXT_BUFFER(app->editor_buffer), &iter, "\n\n", -1);
-}
 
 void on_file_save_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
@@ -431,4 +449,28 @@ void on_view_toggle_vertical_ruler_clicked(GtkWidget *widget, gpointer data) {
     } else {
         gtk_widget_hide(app->vertical_ruler);
     }
+}
+
+void on_file_new_page_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app_widgets = (AppWidgets *)data;
+
+    append_new_page_to_current_document(app_widgets);
+}
+
+void on_file_new_document_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app_widgets = (AppWidgets *)data;
+
+    static int doc_count = 2;
+
+    gchar title[64];
+
+    sprintf(title, "Document %d", doc_count++);
+
+    create_new_tab(app_widgets, title);
 }

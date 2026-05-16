@@ -21,6 +21,7 @@ typedef struct {
     GtkWidget *editor_view;   // Vue d'edition
     GtkWidget *horizontal_ruler;
     GtkWidget *vertical_ruler;
+    GtkWidget *notebook;
     GapBuffer *gb;
 
     GtkSourceBuffer *editor_buffer;
@@ -41,6 +42,8 @@ void create_main_window(GtkApplication *app, gpointer user_data);
 GtkWidget *create_toolbar(AppWidgets *app, GtkAccelGroup *accel_group);
 GtkWidget *create_editor(void);
 GtkWidget *create_sidebar(void);
+GtkWidget* create_new_tab(AppWidgets *app_widgets, const gchar *title);
+void append_new_page_to_current_document(AppWidgets *app_widgets);
 
 /* =========================================================
    CALLBACKS (actions boutons)

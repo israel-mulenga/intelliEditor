@@ -6,10 +6,13 @@
 /* Callbacks des boutons */
 void on_correct_clicked(GtkWidget *widget, gpointer data);
 void on_rewrite_clicked(GtkWidget *widget, gpointer data);
+void on_llm_rewrite_clicked(GtkWidget *widget, gpointer data);
+void on_llm_grammar_clicked(GtkWidget *widget, gpointer data);
 void on_start_clicked(GtkWidget *widget, gpointer data);
 void on_quit_clicked(GtkWidget *widget, gpointer data);
 void on_file_import_clicked(GtkWidget *widget, gpointer data);
 void on_file_new_page_clicked(GtkWidget *widget, gpointer data);
+void on_file_new_document_clicked(GtkWidget *widget, gpointer data);
 void on_file_save_clicked(GtkWidget *widget, gpointer data);
 void on_file_save_as_clicked(GtkWidget *widget, gpointer data);
 void on_edit_undo_clicked(GtkWidget *widget, gpointer data); // Callback pour le bouton Undo dans le menu Edit
