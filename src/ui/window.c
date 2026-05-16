@@ -3,6 +3,7 @@
 #include "ui/sidebar.h"
 #include "ui/toolbar.h"
 #include "ui/callbacks.h"
+#include "llm/llm_client.h"
 #include "editor/gap_buffer.h"
 #include <hunspell/hunspell.h>
 
@@ -12,7 +13,17 @@
 static void setup_css(void);
 static void init_hunspell(AppWidgets *app_widgets);
 static void cleanup_app_widgets(GtkWidget *widget, gpointer data);
-static GtkWidget* create_editor_page(AppWidgets *app_widgets);
+static GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_group);
+static gboolean draw_horizontal_ruler(
+    GtkWidget *widget,
+    cairo_t *cr,
+    gpointer data
+);
+static gboolean draw_vertical_ruler(
+    GtkWidget *widget,
+    cairo_t *cr,
+    gpointer data
+);
 
 /* =========================================================
    FONCTION PRINCIPALE : création fenêtre
@@ -22,6 +33,7 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 
     GtkWidget *window;
     GtkWidget *stack;
+    GtkAccelGroup *accel_group;
 
     /* Allocation structure globale */
     AppWidgets *app_widgets = g_new0(AppWidgets, 1);
@@ -43,6 +55,9 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 650);
     gtk_widget_set_name(window, "app-window");
 
+    accel_group = gtk_accel_group_new();
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
     /* ================= STACK (pages) ================= */
     stack = gtk_stack_new();
     gtk_container_add(GTK_CONTAINER(window), stack);
@@ -62,7 +77,23 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     gtk_box_pack_start(GTK_BOX(welcome_box), open_button, FALSE, FALSE, 0);
 
     gtk_stack_add_named(GTK_STACK(stack), welcome_box, "welcome");
-    gtk_stack_add_named(GTK_STACK(stack), create_editor_page(app_widgets), "editor");
+    gtk_stack_add_named(GTK_STACK(stack), create_editor_page(app_widgets, accel_group), "editor");
+
+    /* Initialiser le client LLM (facultatif) */
+    if (llm_client_init(NULL)) {
+        if (!llm_client_server_up()) {
+            if (app_widgets->statusbar) {
+                gtk_statusbar_push(GTK_STATUSBAR(app_widgets->statusbar), 0,
+                    "⚠ LLM non disponible (serveur injoignable). Veuillez lancer start_llm.sh");
+            }
+        }
+    } else {
+        if (app_widgets->statusbar) {
+            gtk_statusbar_push(GTK_STATUSBAR(app_widgets->statusbar), 0,
+
+                "⚠ LLM initialisation échouée");
+        }
+    }
 
     gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "welcome");
@@ -77,23 +108,116 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 /* =========================================================
    PAGE ÉDITEUR (VERSION PROPRE WORD-LIKE)
    ========================================================= */
-GtkWidget* create_editor_page(AppWidgets *app_widgets) {
+GtkWidget* create_new_tab(AppWidgets *app_widgets, const gchar *title)
+{
+    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+
+    GtkWidget *editor = create_editor();
+
+    gtk_container_add(GTK_CONTAINER(scroll), editor);
+
+    GtkWidget *tab_label = gtk_label_new(title);
+
+    gtk_notebook_append_page(
+        GTK_NOTEBOOK(app_widgets->notebook),
+        scroll,
+        tab_label
+    );
+
+    gtk_widget_show_all(scroll);
+
+    return scroll;
+}
+
+void append_new_page_to_current_document(AppWidgets *app_widgets)
+{
+    if (!app_widgets || !app_widgets->notebook) {
+        return;
+    }
+
+    GtkNotebook *notebook = GTK_NOTEBOOK(app_widgets->notebook);
+    gint page_index = gtk_notebook_get_current_page(notebook);
+    if (page_index < 0) {
+        return;
+    }
+
+    GtkWidget *scroll = gtk_notebook_get_nth_page(notebook, page_index);
+    if (!scroll) {
+        return;
+    }
+
+    GtkWidget *child = gtk_bin_get_child(GTK_BIN(scroll));
+    GtkWidget *center_box = NULL;
+
+    /* If scrolled window wraps the child in a viewport, unwrap it. */
+    if (GTK_IS_VIEWPORT(child)) {
+        center_box = gtk_bin_get_child(GTK_BIN(child));
+    } else if (GTK_IS_BOX(child)) {
+        center_box = child;
+    }
+
+    if (!center_box || !GTK_IS_BOX(center_box)) {
+        return;
+    }
+
+    /* Créer une nouvelle page A4 */
+    GtkWidget *page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_name(page, "a4-page");
+    gtk_widget_set_size_request(page, 794, 1123);
+
+    /* Rulers */
+    GtkWidget *horizontal_ruler = gtk_drawing_area_new();
+    gtk_widget_set_name(horizontal_ruler, "horizontal-ruler");
+    gtk_widget_set_size_request(horizontal_ruler, 794, 30);
+    g_signal_connect(horizontal_ruler, "draw", G_CALLBACK(draw_horizontal_ruler), NULL);
+
+    GtkWidget *vertical_ruler = gtk_drawing_area_new();
+    gtk_widget_set_name(vertical_ruler, "vertical-ruler");
+    gtk_widget_set_size_request(vertical_ruler, 30, -1);
+    g_signal_connect(vertical_ruler, "draw", G_CALLBACK(draw_vertical_ruler), NULL);
+
+    /* Editor */
+    GtkWidget *editor = create_editor();
+    gtk_widget_set_name(editor, "editor-textview");
+
+    GtkWidget *editor_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(editor_row), vertical_ruler, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(editor_row), editor, TRUE, TRUE, 0);
+
+    /* Ajouter rulers + editor dans la page */
+    gtk_box_pack_start(GTK_BOX(page), horizontal_ruler, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(page), editor_row, TRUE, TRUE, 0);
+
+    gtk_widget_set_margin_top(editor, 96);
+    gtk_widget_set_margin_bottom(editor, 96);
+    gtk_widget_set_margin_start(editor, 96);
+    gtk_widget_set_margin_end(editor, 96);
+
+    gtk_widget_set_hexpand(editor, TRUE);
+    gtk_widget_set_vexpand(editor, FALSE);
+
+    /* Insérer la nouvelle page sous les autres */
+    gtk_box_pack_start(GTK_BOX(center_box), page, FALSE, FALSE, 40);
+    gtk_widget_show_all(page);
+}
+   
+GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
 
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-
+    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
     /* ================= TOOLBAR ================= */
-    GtkWidget *toolbar = create_toolbar(app_widgets);
+    GtkWidget *toolbar = create_toolbar(app_widgets, accel_group);
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
 
-    /* ================= SCROLL (ZONE DOCUMENT) ================= */
-    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_name(scroll, "document-scroll");
+    /* ================= NOTEBOOK ================= */
+    GtkWidget *notebook = gtk_notebook_new();
 
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-        GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_widget_set_hexpand(notebook, TRUE);
+    gtk_widget_set_vexpand(notebook, TRUE);
 
-    gtk_widget_set_hexpand(scroll, TRUE);
-    gtk_widget_set_vexpand(scroll, TRUE);
+    app_widgets->notebook = notebook;
+
+    gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, TRUE, 0);
 
     /* ================= CONTAINER CENTRÉ ================= */
     GtkWidget *center_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -103,22 +227,100 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets) {
     GtkWidget *page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_name(page, "a4-page");
 
-    /* Taille A4 réaliste */
+    /* Taille fixe A4 : 794x1123 pixels à 96 DPI */
     gtk_widget_set_size_request(page, 794, 1123);
 
+    /* ================= RULERS ================= */
+
+  /* ================= HORIZONTAL RULER ================= */
+
+    GtkWidget *horizontal_ruler = gtk_drawing_area_new();
+
+    gtk_widget_set_name(horizontal_ruler, "horizontal-ruler");
+
+    gtk_widget_set_size_request(horizontal_ruler, 794, 30);
+
+    g_signal_connect(
+        horizontal_ruler,
+        "draw",
+        G_CALLBACK(draw_horizontal_ruler),
+        NULL
+    );
+
+    app_widgets->horizontal_ruler = horizontal_ruler;
+
+    /* ================= VERTICAL RULER ================= */
+
+    GtkWidget *vertical_ruler = gtk_drawing_area_new();
+
+    gtk_widget_set_name(vertical_ruler, "vertical-ruler");
+
+    gtk_widget_set_size_request(vertical_ruler, 30, -1);
+
+    g_signal_connect(
+        vertical_ruler,
+        "draw",
+        G_CALLBACK(draw_vertical_ruler),
+        NULL
+    );
+
+    app_widgets->vertical_ruler = vertical_ruler;
+
     /* ================= EDITOR ================= */
+
     GtkWidget *editor = create_editor();
-    app_widgets->editor_view = editor;
+
     gtk_widget_set_name(editor, "editor-textview");
+
+    app_widgets->editor_view = editor;
 
     app_widgets->editor_buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor))
     );
-    app_widgets->insert_handler_id = g_signal_connect(app_widgets->editor_buffer, "insert-text",
-                    G_CALLBACK(on_text_inserted), app_widgets);
 
-    app_widgets->delete_handler_id = g_signal_connect(app_widgets->editor_buffer, "delete-range",
-                    G_CALLBACK(on_text_deleted), app_widgets);
+    /* Connect text buffer handlers to keep gap buffer in sync */
+    app_widgets->insert_handler_id = g_signal_connect(app_widgets->editor_buffer,
+                    "insert-text", G_CALLBACK(on_text_inserted), app_widgets);
+    app_widgets->delete_handler_id = g_signal_connect(app_widgets->editor_buffer,
+                    "delete-range", G_CALLBACK(on_text_deleted), app_widgets);
+
+    /* ================= RÈGLE + ÉDITEUR ================= */
+
+    GtkWidget *editor_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+
+    gtk_box_pack_start(
+        GTK_BOX(editor_row),
+        vertical_ruler,
+        FALSE,
+        FALSE,
+        0
+    );
+
+    gtk_box_pack_start(
+        GTK_BOX(editor_row),
+        editor,
+        TRUE,
+        TRUE,
+        0
+    );
+
+    /* ================= AJOUT DANS PAGE ================= */
+
+    gtk_box_pack_start(
+        GTK_BOX(page),
+        horizontal_ruler,
+        FALSE,
+        FALSE,
+        0
+    );
+
+    gtk_box_pack_start(
+        GTK_BOX(page),
+        editor_row,
+        TRUE,
+        TRUE,
+        0
+    );
 
     /* Marges Word */
     gtk_widget_set_margin_top(editor, 96);
@@ -127,14 +329,15 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets) {
     gtk_widget_set_margin_end(editor, 96);
 
     gtk_widget_set_hexpand(editor, TRUE);
-    gtk_widget_set_vexpand(editor, TRUE);
+    gtk_widget_set_vexpand(editor, FALSE);
 
     /* Assemblage */
-    gtk_box_pack_start(GTK_BOX(page), editor, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(center_box), page, FALSE, FALSE, 40);
     gtk_container_add(GTK_CONTAINER(scroll), center_box);
 
-    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+    GtkWidget *tab_label = gtk_label_new("Document 1");
+
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook),scroll,tab_label);
 
     /* ================= STATUSBAR ================= */
     GtkWidget *statusbar = gtk_statusbar_new();
@@ -209,6 +412,16 @@ static void setup_css(void) {
         "    selection-color: #ffffff;"
         "}"
 
+        "#horizontal-ruler {"
+        "    background-color: #f3f3f3;"
+        "    border-bottom: 1px solid #cdcdcd;"
+        "}"
+
+        "#vertical-ruler {"
+        "    background-color: #f3f3f3;"
+        "    border-right: 1px solid #cdcdcd;"
+        "}"
+
         /* ===== STATUSBAR ===== */
         "#statusbar {"
         "    background-color: #f0f0f0;"
@@ -249,7 +462,21 @@ static void setup_css(void) {
         "    border-top: 1px solid #e6e6e6;"
         "    padding: 6px 10px;"
         "    font-size: 12px;"
+        "}"
+        
+        /* ===== HORIZON RULEr ===== */
+        "#horizontal-ruler {"
+        "   background-color: #f8fafc;"
+        "   border-bottom: 1px solid #cbd5e1;"
+        "}"
+
+        /* ===== VERTICAL RULER ===== */
+
+        "#vertical-ruler {"
+        "   background-color: #f8fafc;"
+        "   border-right: 1px solid #cbd5e1;"
         "}";
+        
 
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
 
@@ -296,4 +523,124 @@ static void init_hunspell(AppWidgets *app_widgets) {
     if (g_file_test(fr_aff, G_FILE_TEST_EXISTS) && g_file_test(fr_dic, G_FILE_TEST_EXISTS)) {
         app_widgets->hun_fr = Hunspell_create(fr_aff, fr_dic);
     }
+}
+
+static gboolean draw_horizontal_ruler(
+    GtkWidget *widget,
+    cairo_t *cr,
+    gpointer data)
+{
+    (void)data;
+
+    GtkAllocation alloc;
+    gtk_widget_get_allocation(widget, &alloc);
+
+    int width = alloc.width;
+    int height = alloc.height;
+
+    /* fond */
+    cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
+    cairo_paint(cr);
+
+    /* couleur des traits */
+    cairo_set_source_rgb(cr, 0.15, 0.15, 0.15);
+
+    cairo_set_line_width(cr, 1);
+
+    int cm_spacing = 50;
+
+    for (int i = 0; i < width; i += 10)
+    {
+        int line_height = 8;
+
+        /* grande graduation */
+        if (i % cm_spacing == 0)
+            line_height = 22;
+
+        /* moyenne graduation */
+        else if (i % 20 == 0)
+            line_height = 15;
+
+        cairo_move_to(cr, i, height);
+        cairo_line_to(cr, i, height - line_height);
+
+        cairo_stroke(cr);
+
+        /* numéros */
+        if (i % cm_spacing == 0)
+        {
+            char number[10];
+
+            sprintf(number, "%d", i / cm_spacing);
+
+            cairo_move_to(cr, i + 2, 12);
+
+            cairo_set_font_size(cr, 11);
+
+            cairo_show_text(cr, number);
+        }
+    }
+
+    return FALSE;
+}
+
+static gboolean draw_vertical_ruler(
+    GtkWidget *widget,
+    cairo_t *cr,
+    gpointer data)
+{
+    (void)data;
+
+    GtkAllocation alloc;
+
+    gtk_widget_get_allocation(widget, &alloc);
+
+    int width = alloc.width;
+    int height = alloc.height;
+
+    cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
+
+    cairo_paint(cr);
+
+    cairo_set_source_rgb(cr, 0.15, 0.15, 0.15);
+
+    int cm_spacing = 50;
+
+    for (int i = 0; i < height; i += 10)
+    {
+        int line_width = 8;
+
+        if (i % cm_spacing == 0)
+            line_width = 20;
+
+        else if (i % 20 == 0)
+            line_width = 14;
+
+        cairo_move_to(cr, width, i);
+
+        cairo_line_to(cr, width - line_width, i);
+
+        cairo_stroke(cr);
+
+        if (i % cm_spacing == 0)
+        {
+            char number[10];
+
+            sprintf(number, "%d", i / cm_spacing);
+
+            cairo_save(cr);
+
+            cairo_translate(cr, 10, i + 10);
+
+            cairo_rotate(cr, -1.5708);
+
+            cairo_set_font_size(cr, 10);
+
+            cairo_show_text(cr, number);
+
+            cairo_restore(cr);
+        }
+    }
+
+    return FALSE;
 }

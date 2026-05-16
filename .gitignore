@@ -59,3 +59,6 @@ dkms.conf
 tests/*.md
 IMPLEMENTATION_CHECKLIST.md
 TEST_SUITE_SUMMARY.md
+
+# Local binaries
+test_llm
