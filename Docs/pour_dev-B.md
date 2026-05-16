@@ -17,7 +17,7 @@ Dans ton fichier de toolbar ou de callbacks UI : C'EST FAIT
 #include "llm/llm_bridge.h"
 ```
 
-### 2. Remplir AppContext
+### 2. Remplir AppContext : C'EST FAIT
 
 ```c
 // Dans ton init GTK :
@@ -27,7 +27,7 @@ app->statusbar   = ta_statusbar;
 app->sidebar     = ta_sidebar;  // NULL si pas encore prête
 ```
 
-### 3. Connecter les boutons
+### 3. Connecter les boutons : C'EST FAIT
 
 ```c
 // Bouton "Reformuler"
@@ -41,7 +41,8 @@ g_signal_connect(btn_grammar, "clicked",
                  app);
 ```
 
-### 4. Initialiser le LLM au démarrage
+### 4. Initialiser le LLM au démarrage : C'EST FAIT
+
 
 ```c
 // Dans ta fonction d'init, AVANT d'afficher la fenêtre :
@@ -54,16 +55,37 @@ if (!llm_client_server_up()) {
     gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0,
         "⚠ LLM non disponible — lancer start_llm.sh");
 }
+
+
+
+
+MOI(DEV B) J'AI FAIT
+
+/* Initialiser le client LLM (facultatif) */
+    if (llm_client_init(NULL)) {
+        if (!llm_client_server_up()) {
+            if (app_widgets->statusbar) {
+                gtk_statusbar_push(GTK_STATUSBAR(app_widgets->statusbar), 0,
+                    "⚠ LLM non disponible (serveur injoignable). Veuillez lancer start_llm.sh");
+            }
+        }
+    } else {
+        if (app_widgets->statusbar) {
+            gtk_statusbar_push(GTK_STATUSBAR(app_widgets->statusbar), 0,
+
+                "⚠ LLM initialisation échouée");
+        }
+    }
 ```
 
-### 5. Libérer à la fermeture
+### 5. Libérer à la fermeture : PAS ENCORE FAIT
 
 ```c
 // Dans ton callback de fermeture de fenêtre :
 llm_client_cleanup();
 ```
 
-## Serveur LLM
+## Serveur LLM : PAS ENCORE FAIT
 
 Le serveur doit être lancé avant l'application :
 ```bash
