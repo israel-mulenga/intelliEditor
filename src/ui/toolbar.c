@@ -265,6 +265,77 @@ GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group) {
     GtkWidget *insert_item = gtk_menu_item_new_with_label("Insert");
     GtkWidget *insert_menu = gtk_menu_new();
 
+    /* ===== Image ===== */
+    GtkWidget *image_item = gtk_menu_item_new_with_label("Image...");
+    g_signal_connect(image_item, "activate",G_CALLBACK(on_insert_image_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), image_item);
+
+    
+    /* ===== Table ===== */
+    GtkWidget *table_item = gtk_menu_item_new_with_label("Table...");
+    g_signal_connect(table_item, "activate",G_CALLBACK(on_insert_table_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), table_item);
+
+
+    /* ===== Separator ===== */
+    GtkWidget *separator1 = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), separator1);
+
+    /* ===== Date & Time ===== */
+    GtkWidget *date_item = gtk_menu_item_new_with_label("Date & Time");
+    g_signal_connect(date_item, "activate",
+        G_CALLBACK(on_insert_date_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), date_item);
+
+    /* ===== Page Break ===== */
+    GtkWidget *page_break_item = gtk_menu_item_new_with_label("Page Break");
+    g_signal_connect(page_break_item, "activate",
+        G_CALLBACK(on_insert_page_break_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), page_break_item);
+
+    /* ===== Separator ===== */
+    GtkWidget *separator2 = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), separator2);
+
+    /* ===== Header ===== */
+    GtkWidget *header_item = gtk_menu_item_new_with_label("Header");
+    g_signal_connect(header_item, "activate",
+        G_CALLBACK(on_insert_header_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), header_item);
+
+        /* ===== Footer ===== */
+    GtkWidget *footer_item = gtk_menu_item_new_with_label("Footer");
+    g_signal_connect(footer_item, "activate",
+        G_CALLBACK(on_insert_footer_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), footer_item);
+
+    /* ===== Separator ===== */
+    GtkWidget *separator3 = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), separator3);
+
+    /* ===== Hyperlink ===== */
+    GtkWidget *link_item = gtk_menu_item_new_with_label("Hyperlink");
+    g_signal_connect(link_item, "activate",
+        G_CALLBACK(on_insert_link_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), link_item);
+
+    /* ===== Comment ===== */
+    GtkWidget *comment_item = gtk_menu_item_new_with_label("Comment");
+    g_signal_connect(comment_item, "activate",
+        G_CALLBACK(on_insert_comment_clicked), app_widgets);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(insert_menu), comment_item);
+
+
+
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(insert_item), insert_menu);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), insert_item);
 

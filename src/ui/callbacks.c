@@ -474,3 +474,148 @@ void on_file_new_document_clicked(GtkWidget *widget, gpointer data)
 
     create_new_tab(app_widgets, title);
 }
+/* =========================================================
+   INSERT ELEMENTS CALLBACKS
+   ========================================================= */
+void on_insert_date_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app_widgets = (AppWidgets *)data;
+
+    GtkTextIter iter;
+
+    gtk_text_buffer_get_iter_at_mark(
+        GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        &iter,
+        gtk_text_buffer_get_insert(
+            GTK_TEXT_BUFFER(app_widgets->editor_buffer)
+        )
+    );
+
+    gtk_text_buffer_insert(
+        GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        &iter,
+        "16/05/2026 14:35",
+        -1
+    );
+}
+
+void on_insert_image_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app_widgets = (AppWidgets *)data;
+
+    GtkTextIter iter;
+
+    gtk_text_buffer_get_iter_at_mark(
+        GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        &iter,
+        gtk_text_buffer_get_insert(
+            GTK_TEXT_BUFFER(app_widgets->editor_buffer)
+        )
+    );
+
+    GtkWidget *image = gtk_image_new_from_icon_name("image-x-generic", GTK_ICON_SIZE_MENU);
+
+    gtk_text_buffer_insert_pixbuf(
+        GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        &iter,
+        gtk_image_get_pixbuf(GTK_IMAGE(image))
+    );
+}
+
+void on_insert_table_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(app->editor_buffer), &iter, gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(app->editor_buffer)));
+        gtk_text_buffer_insert(GTK_TEXT_BUFFER(app->editor_buffer), &iter, "Table\n", -1);
+    }
+}
+
+void on_insert_page_break_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(app->editor_buffer), &iter, gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(app->editor_buffer)));
+        gtk_text_buffer_insert(GTK_TEXT_BUFFER(app->editor_buffer), &iter, "\f", -1); // Form feed character as page break
+    }
+}
+
+void on_insert_header_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(app->editor_buffer), &iter, gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(app->editor_buffer)));
+        gtk_text_buffer_insert(GTK_TEXT_BUFFER(app->editor_buffer), &iter, "Header\n", -1);
+    }
+}
+
+void on_insert_footer_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (app->editor_buffer)
+    {
+        GtkTextIter iter;
+
+        gtk_text_buffer_get_iter_at_mark(
+            GTK_TEXT_BUFFER(app->editor_buffer),
+            &iter,
+            gtk_text_buffer_get_insert(
+                GTK_TEXT_BUFFER(app->editor_buffer)
+            )
+        );
+
+        gtk_text_buffer_insert(
+            GTK_TEXT_BUFFER(app->editor_buffer),
+            &iter,
+            "Footer\n",
+            -1
+        );
+    }
+}
+
+void on_insert_link_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(app->editor_buffer), &iter, gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(app->editor_buffer)));
+        gtk_text_buffer_insert(GTK_TEXT_BUFFER(app->editor_buffer), &iter, "https://www.example.com\n", -1);
+    }
+}
+
+void on_insert_comment_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app = (AppWidgets *)data;
+
+    if (app->editor_buffer)
+    {
+        GtkTextIter iter;
+
+        gtk_text_buffer_get_iter_at_mark(
+            GTK_TEXT_BUFFER(app->editor_buffer),
+            &iter,
+            gtk_text_buffer_get_insert(
+                GTK_TEXT_BUFFER(app->editor_buffer)
+            )
+        );
+
+        gtk_text_buffer_insert(
+            GTK_TEXT_BUFFER(app->editor_buffer),
+            &iter,
+            "[Commentaire]\n",
+            -1
+        );
+    }
+}

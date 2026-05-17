@@ -30,4 +30,19 @@ void on_text_inserted(GtkTextBuffer *textbuffer, GtkTextIter *location,
 void on_text_deleted(GtkTextBuffer *textbuffer, GtkTextIter *start, 
                      GtkTextIter *end, gpointer data);
 
+void on_text_changed(GtkTextBuffer *textbuffer, gpointer data);
+
+void on_text_modified(GtkTextBuffer *textbuffer, gpointer data);
+
+void on_text_cursor_moved(GtkTextBuffer *textbuffer, GtkTextIter *location, gpointer data);
+
+void on_insert_date_clicked(GtkWidget *widget, gpointer data);
+void on_insert_image_clicked(GtkWidget *widget, gpointer data);
+void on_insert_table_clicked(GtkWidget *widget, gpointer data);
+void on_insert_page_break_clicked(GtkWidget *widget, gpointer data);
+void on_insert_header_clicked(GtkWidget *widget, gpointer data);
+void on_insert_footer_clicked(GtkWidget *widget, gpointer data);
+void on_insert_link_clicked(GtkWidget *widget, gpointer data);
+void on_insert_comment_clicked(GtkWidget *widget, gpointer data);
+
 #endif
