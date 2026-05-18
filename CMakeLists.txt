@@ -55,6 +55,12 @@ target_include_directories(llm_engine PUBLIC
 target_include_directories(llm_engine PRIVATE
     ${CURL_INCLUDE_DIRS}
     ${GLIB_INCLUDE_DIRS}
+    ${GTK3_INCLUDE_DIRS}
+    ${GTKSOURCEVIEW_INCLUDE_DIRS}
+)
+target_link_libraries(llm_engine PUBLIC
+    ${GTK3_LIBRARIES}
+    ${GTKSOURCEVIEW_LIBRARIES}
 )
 target_link_libraries(llm_engine PUBLIC
     ${CURL_LIBRARIES}
@@ -78,6 +84,9 @@ endforeach()
 
 if(NLP_ENGINE_READY)
     add_library(nlp_engine STATIC ${NLP_ENGINE_SOURCES})
+    target_include_directories(nlp_engine PUBLIC
+        ${CMAKE_SOURCE_DIR}/include
+    )
     target_include_directories(nlp_engine PRIVATE
         ${GTK3_INCLUDE_DIRS}
         ${GTKSOURCEVIEW_INCLUDE_DIRS}
