@@ -3,13 +3,16 @@
 #include "ui/sidebar.h"
 #include "ui/toolbar.h"
 #include "ui/callbacks.h"
+#include "config/config_parser.h"
+#include "editor/file_manager.h"
 #include "editor/gap_buffer.h"
 #include <hunspell/hunspell.h>
 
 /* =========================================================
    PROTOTYPES INTERNES (usage uniquement dans ce fichier)
    ========================================================= */
-static void setup_css(void);
+static void setup_css(const char *theme);
+static gboolean autosave_tick(gpointer user_data);
 static void init_hunspell(AppWidgets *app_widgets);
 static void cleanup_app_widgets(GtkWidget *widget, gpointer data);
 static GtkWidget* create_editor_page(AppWidgets *app_widgets);
@@ -17,8 +20,49 @@ static GtkWidget* create_editor_page(AppWidgets *app_widgets);
 /* =========================================================
    FONCTION PRINCIPALE : création fenêtre
    ========================================================= */
+void app_autosave_reschedule(AppWidgets *app) {
+    if (!app) {
+        return;
+    }
+
+    if (app->autosave_source_id != 0) {
+        g_source_remove(app->autosave_source_id);
+        app->autosave_source_id = 0;
+    }
+
+    if (app->autosave_interval_sec == 0 || app->current_file_path == NULL) {
+        return;
+    }
+
+    app->autosave_source_id = g_timeout_add_seconds(
+        app->autosave_interval_sec,
+        autosave_tick,
+        app
+    );
+}
+
+static gboolean autosave_tick(gpointer user_data) {
+    AppWidgets *app = (AppWidgets *)user_data;
+
+    if (!app || !app->gb || !app->current_file_path) {
+        return G_SOURCE_CONTINUE;
+    }
+
+    if (!gap_buffer_save_to_file(app->gb, app->current_file_path)) {
+        g_printerr("Autosave failed for: %s\n", app->current_file_path);
+    }
+
+    return G_SOURCE_CONTINUE;
+}
+
 void create_main_window(GtkApplication *app, gpointer user_data) {
-    GapBuffer *gb = (GapBuffer *)user_data; 
+    typedef struct {
+        GapBuffer *gb;
+        AppConfig config;
+    } AppStartupData;
+
+    AppStartupData *startup = (AppStartupData *)user_data;
+    GapBuffer *gb = startup ? startup->gb : NULL;
 
     GtkWidget *window;
     GtkWidget *stack;
@@ -30,10 +74,20 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
     app_widgets->app = app;
     app_widgets->hun_en = NULL;
     app_widgets->hun_fr = NULL;
+    app_widgets->autosave_source_id = 0;
+    app_widgets->autosave_interval_sec = 0;
+
+    if (startup) {
+        app_widgets->config = startup->config;
+        app_widgets->autosave_interval_sec = startup->config.autosave_interval_sec;
+    } else {
+        app_config_set_defaults(&app_widgets->config);
+    }
+
     init_hunspell(app_widgets);
 
     /* Chargement du style CSS */
-    setup_css();
+    setup_css(app_widgets->config.theme);
 
 
     /* ================= WINDOW ================= */
@@ -151,27 +205,36 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets) {
 /* =========================================================
    CSS (STYLE GLOBAL)
    ========================================================= */
-static void setup_css(void) {
+static void setup_css(const char *theme) {
 
     GtkCssProvider *provider = gtk_css_provider_new();
+    gboolean dark = theme && g_ascii_strcasecmp(theme, "dark") == 0;
 
-    const gchar *css =
+    const gchar *window_bg = dark ? "#2b2b2b" : "#e8e8e8";
+    const gchar *window_fg = dark ? "#e8e8e8" : "#1e1e1e";
+    const gchar *toolbar_bg = dark ? "#333333" : "#f7f7f7";
+    const gchar *page_bg = dark ? "#1e1e1e" : "#ffffff";
+    const gchar *page_fg = dark ? "#f0f0f0" : "#1e1e1e";
+    const gchar *status_bg = dark ? "#2f2f2f" : "#f0f0f0";
+    const gchar *status_fg = dark ? "#bbbbbb" : "#666666";
+
+    gchar *css = g_strdup_printf(
         /* ===== FENÊTRE ===== */
         "window#app-window {"
-        "    background-color: #e8e8e8;"
-        "    color: #1e1e1e;"
+        "    background-color: %s;"
+        "    color: %s;"
         "}"
 
         /* ===== TOOLBAR ===== */
         "#toolbar {"
-        "    background-color: #f7f7f7;"
+        "    background-color: %s;"
         "    border-bottom: 1px solid #d0d0d0;"
         "    padding: 8px 12px;"
         "}"
         
         "button#toolbar-button {"
-        "    background-color: #f0f0f0;"
-        "    color: #1e1e1e;"
+        "    background-color: %s;"
+        "    color: %s;"
         "    border: 1px solid #bfbfbf;"
         "    border-radius: 3px;"
         "    padding: 6px 12px;"
@@ -185,15 +248,15 @@ static void setup_css(void) {
 
         /* ===== DOCUMENT CONTAINER (feuille) ===== */
         "#a4-page {"
-        "    background-color: #ffffff;"
+        "    background-color: %s;"
         "    border: 1px solid #cfcfcf;"
         "    box-shadow: 0 10px 30px rgba(0,0,0,0.15);"
         "}"
 
         /* ===== ZONE D'ÉDITION (FEUILLE) ===== */
         "#editor-textview {"
-        "    background-color: #ffffff;"
-        "    color: #1e1e1e;"
+        "    background-color: %s;"
+        "    color: %s;"
         "    padding: 0px;"
         "    border: none;"
         "    font-family: 'Calibri', 'Arial', sans-serif;"
@@ -202,8 +265,8 @@ static void setup_css(void) {
         "}"
 
         "textview text {"
-        "    background-color: #ffffff;"
-        "    color: #1e1e1e;"
+        "    background-color: %s;"
+        "    color: %s;"
         "    caret-color: #111111;"
         "    selection-background-color: #0078d4;"
         "    selection-color: #ffffff;"
@@ -211,8 +274,8 @@ static void setup_css(void) {
 
         /* ===== STATUSBAR ===== */
         "#statusbar {"
-        "    background-color: #f0f0f0;"
-        "    color: #666666;"
+        "    background-color: %s;"
+        "    color: %s;"
         "    border-top: 1px solid #d0d0d0;"
         "    padding: 4px 8px;"
         "    font-size: 12px;"
@@ -244,14 +307,22 @@ static void setup_css(void) {
 
         /* ===== STATUS BAR ===== */
         "statusbar#statusbar {"
-        "    background-color: #f7f7f7;"
-        "    color: #666666;"
+        "    background-color: %s;"
+        "    color: %s;"
         "    border-top: 1px solid #e6e6e6;"
         "    padding: 6px 10px;"
         "    font-size: 12px;"
-        "}";
+        "}",
+        window_bg, window_fg,
+        toolbar_bg, toolbar_bg, page_fg,
+        page_bg, page_bg, page_fg,
+        page_bg, page_fg,
+        status_bg, status_fg,
+        status_bg, status_fg
+    );
 
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
+    g_free(css);
 
     gtk_style_context_add_provider_for_screen(
         gdk_screen_get_default(),
@@ -267,6 +338,11 @@ static void cleanup_app_widgets(GtkWidget *widget, gpointer data) {
     (void)widget; // unused
 
     AppWidgets *app = (AppWidgets *)data;
+
+    if (app->autosave_source_id != 0) {
+        g_source_remove(app->autosave_source_id);
+        app->autosave_source_id = 0;
+    }
 
     if (app->hun_en) {
         Hunspell_destroy(app->hun_en);
