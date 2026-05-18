@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
 #include <hunspell/hunspell.h>
+#include "config/config_parser.h"
 #include "editor/gap_buffer.h"
 
 /* =========================================================
@@ -29,6 +30,10 @@ typedef struct {
     gulong delete_handler_id;
     gchar *current_file_path;
 
+    AppConfig config;
+    guint autosave_source_id;
+    guint autosave_interval_sec;
+
     Hunhandle *hun_en;        // Dictionnaire anglais
     Hunhandle *hun_fr;        // Dictionnaire francais
 
@@ -38,6 +43,8 @@ typedef struct {
    FONCTIONS PRINCIPALES UI
    ========================================================= */
 void create_main_window(GtkApplication *app, gpointer user_data);
+
+void app_autosave_reschedule(AppWidgets *app);
 
 GtkWidget *create_toolbar(AppWidgets *app, GtkAccelGroup *accel_group);
 GtkWidget *create_editor(void);

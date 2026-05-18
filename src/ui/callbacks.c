@@ -151,6 +151,8 @@ static void save_to_path(AppWidgets *app, const gchar *filename, gboolean update
         g_free(app->current_file_path);
         app->current_file_path = g_strdup(filename);
     }
+
+    app_autosave_reschedule(app);
 }
 
 // Called when "Correct" button is clicked
@@ -248,6 +250,7 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data) {
 
             g_free(app->current_file_path);
             app->current_file_path = g_strdup(filename);
+            app_autosave_reschedule(app);
         } else {
             g_printerr("Unable to import file: %s\n", filename);
         }

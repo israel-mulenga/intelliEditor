@@ -35,8 +35,7 @@ void gap_buffer_delete(GapBuffer *gb); // Supprime un caractère et sauvegarde l
 void gap_buffer_move_cursor(GapBuffer *gb, size_t new_position);
 void gap_buffer_destroy(GapBuffer *gb); // Libère la mémoire, y compris l'historique
 char* gap_buffer_get_content(GapBuffer *gb);
-void gap_buffer_backspace(GapBuffer *gb); // Efface le caractère précédent et sauvegarde l'état pour undo
-GapBuffer *gap_buffer_load_from_file(const char *filename);
+void gap_buffer_backspace(GapBuffer *gb);
 CursorPos gap_buffer_get_cursor_pos(GapBuffer *gb);
 void gap_buffer_set_cursor_pos(GapBuffer *gb, int x, int y);
 void gap_buffer_push_history(GapBuffer *gb); // Sauvegarde l'état actuel dans l'historique
