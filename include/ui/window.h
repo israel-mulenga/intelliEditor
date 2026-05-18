@@ -6,6 +6,7 @@
 #include <hunspell/hunspell.h>
 #include "config/config_parser.h"
 #include "editor/gap_buffer.h"
+#include "rules/rules.h"
 
 /* =========================================================
    STRUCTURE GLOBALE
@@ -36,6 +37,9 @@ typedef struct {
 
     Hunhandle *hun_en;        // Dictionnaire anglais
     Hunhandle *hun_fr;        // Dictionnaire francais
+
+    RuleSet *ruleset;
+    gchar *rules_file_path;
 
 } AppWidgets;
 

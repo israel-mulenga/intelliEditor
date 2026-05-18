@@ -81,6 +81,23 @@ static void update_sidebar_text(AppWidgets *app_widgets, const gchar *text) {
     sidebar_set_summary(app_widgets->sidebar, text);
 }
 
+static void app_refresh_rules_panel(AppWidgets *app) {
+    if (!app || !app->ruleset || !app->sidebar || !app->editor_buffer) {
+        return;
+    }
+
+    GtkTextIter start;
+    GtkTextIter end;
+    gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(app->editor_buffer), &start);
+    gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(app->editor_buffer), &end);
+    gchar *text = gtk_text_buffer_get_text(
+        GTK_TEXT_BUFFER(app->editor_buffer), &start, &end, FALSE
+    );
+
+    sidebar_refresh_ruleset(app->sidebar, app->ruleset, text);
+    g_free(text);
+}
+
 static void sync_editor_from_gap_buffer(AppWidgets *app_widgets) {
     if (!app_widgets || !app_widgets->editor_buffer || !app_widgets->gb) {
         return;
@@ -160,6 +177,8 @@ void on_correct_clicked(GtkWidget *widget, gpointer data) {
     gchar *message = check_spelling(app_widgets);
     update_sidebar_text(app_widgets, message);
     g_free(message);
+
+    app_refresh_rules_panel(app_widgets);
 }
 
 // Called when "Rewrite" button is clicked
@@ -245,6 +264,7 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data) {
             app->gb = loaded;
 
             sync_editor_from_gap_buffer(app);
+            app_refresh_rules_panel(app);
 
             g_free(app->current_file_path);
             app->current_file_path = g_strdup(filename);

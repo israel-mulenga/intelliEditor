@@ -39,10 +39,6 @@ GtkWidget *create_sidebar(void) {
     g_object_set_data(G_OBJECT(vbox), "rules-file-label", file_label);
     gtk_box_pack_start(GTK_BOX(vbox), file_label, FALSE, FALSE, 0);
 
-    if (g_file_test("config.json", G_FILE_TEST_EXISTS)) {
-        sidebar_set_rules_file(vbox, "config.json");
-    }
-
     GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, FALSE, 4);
 
@@ -102,4 +98,74 @@ GtkListBox *sidebar_get_rules_list(GtkWidget *sidebar) {
     }
 
     return GTK_LIST_BOX(g_object_get_data(G_OBJECT(sidebar), "error-list"));
+}
+
+void sidebar_bind_ruleset(GtkWidget *sidebar, RuleSet *ruleset) {
+    if (!sidebar) {
+        return;
+    }
+
+    g_object_set_data(G_OBJECT(sidebar), "ruleset", ruleset);
+
+    if (ruleset && ruleset->meta.document_type[0]) {
+        gchar *summary = g_strdup_printf(
+            "Document : %s\n%d regle(s) chargee(s).",
+            ruleset->meta.document_type,
+            ruleset->rule_count
+        );
+        sidebar_set_summary(sidebar, summary);
+        g_free(summary);
+    }
+}
+
+void sidebar_refresh_ruleset(GtkWidget *sidebar, RuleSet *ruleset, const char *text) {
+    GtkListBox *list = sidebar_get_rules_list(sidebar);
+    if (!sidebar || !ruleset || !list) {
+        return;
+    }
+
+    GList *children = gtk_container_get_children(GTK_CONTAINER(list));
+    for (GList *node = children; node; node = node->next) {
+        gtk_widget_destroy(GTK_WIDGET(node->data));
+    }
+    g_list_free(children);
+
+    if (!text) {
+        text = "";
+    }
+
+    ruleset_evaluate(ruleset, text);
+
+    int ok = ruleset_count_by_status(ruleset, STATUS_OK);
+    int err = ruleset_count_by_status(ruleset, STATUS_ERROR);
+    int warn = ruleset_count_by_status(ruleset, STATUS_WARNING);
+    int pending = ruleset_count_by_status(ruleset, STATUS_PENDING);
+
+    gchar *summary = g_strdup_printf(
+        "Conformite : %d OK, %d erreur(s), %d avertissement(s), %d en attente",
+        ok, err, warn, pending
+    );
+    sidebar_set_summary(sidebar, summary);
+    g_free(summary);
+
+    for (int i = 0; i < ruleset->rule_count; i++) {
+        const Rule *rule = &ruleset->rules[i];
+        gchar *line = g_strdup_printf(
+            "[%s] %s — %s",
+            rule_status_icon(rule->status),
+            rule->id,
+            rule->description
+        );
+        GtkWidget *row = gtk_label_new(line);
+        gtk_label_set_xalign(GTK_LABEL(row), 0.0);
+        gtk_label_set_line_wrap(GTK_LABEL(row), TRUE);
+        gtk_widget_set_margin_start(row, 8);
+        gtk_widget_set_margin_end(row, 8);
+        gtk_widget_set_margin_top(row, 4);
+        gtk_widget_set_margin_bottom(row, 4);
+        gtk_list_box_insert(list, row, -1);
+        g_free(line);
+    }
+
+    gtk_widget_show_all(GTK_WIDGET(list));
 }

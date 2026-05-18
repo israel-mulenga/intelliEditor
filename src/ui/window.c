@@ -264,6 +264,16 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     GtkWidget *content_paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
     app_widgets->sidebar = create_sidebar();
 
+    const char *rules_path = rules_default_file_path();
+    if (rules_path) {
+        app_widgets->rules_file_path = g_strdup(rules_path);
+        app_widgets->ruleset = ruleset_load(rules_path);
+        if (app_widgets->ruleset) {
+            sidebar_set_rules_file(app_widgets->sidebar, rules_path);
+            sidebar_bind_ruleset(app_widgets->sidebar, app_widgets->ruleset);
+        }
+    }
+
     gtk_paned_pack1(GTK_PANED(content_paned), notebook, TRUE, TRUE);
     gtk_paned_pack2(GTK_PANED(content_paned), app_widgets->sidebar, FALSE, FALSE);
     gtk_paned_set_wide_handle(GTK_PANED(content_paned), TRUE);
@@ -577,6 +587,8 @@ static void cleanup_app_widgets(GtkWidget *widget, gpointer data) {
     }
 
     g_free(app->current_file_path);
+    g_free(app->rules_file_path);
+    ruleset_free(app->ruleset);
 
     g_free(app);
 }

@@ -24,6 +24,7 @@ find_package(Threads REQUIRED)
 add_library(rules_engine STATIC
     src/rules/checkers.c
     src/rules/parser.c
+    src/rules/ruleset_eval.c
     deps/cjson/cJSON.c
 )
 

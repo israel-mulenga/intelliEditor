@@ -1,67 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "rules/rules.h"
 
-int main() {
-    printf("=== BANC DE TEST DU MOTEUR DE REGLES (DEV-D) ===\n\n");
-
-    // 1. Charger la configuration JSON
-    ConfigRules *config = parse_config("config.json");
-    if (!config) {
-        printf("Erreur : Impossible de charger la configuration JSON.\n");
+int main(void) {
+    const char *path = rules_default_file_path();
+    if (!path) {
+        fprintf(stderr, "memoire_licence.json not found\n");
         return 1;
     }
 
-    printf("Configuration chargee avec succes !\n");
-    printf("- Seuil minimum de mots             : %d\n", config->min_words);
-    printf("- Nombre de patterns regex interdits : %d\n\n", config->forbidden_count);
-
-    // Faux texte d'éditeur pour simuler la saisie utilisateur
-    const char *texte_utilisateur = "Ceci est un document hautement secret qui ne doit pas fuiter.";
-    printf("Texte a analyser : \"%s\"\n\n", texte_utilisateur);
-
-    // Variable globale de conformité pour le verdict
-    int texte_conforme = 1;
-
-    // 2. VÉRIFICATION DU NOMBRE DE MOTS MINIMUM
-    printf("Verification du volume de texte... ");
-    int mots_trouves = count_words(texte_utilisateur);
-    
-    if (check_word_count_min(texte_utilisateur, config->min_words)) {
-        printf("[OK] Nombre de mots suffisant (%d/%d)\n", mots_trouves, config->min_words);
-    } else {
-        printf("[ALERTE] Pas assez de mots ! (%d/%d requis)\n", mots_trouves, config->min_words);
-        texte_conforme = 0;
+    RuleSet *ruleset = ruleset_load(path);
+    if (!ruleset) {
+        fprintf(stderr, "Failed to load ruleset from %s\n", path);
+        return 1;
     }
 
-    // 3. VÉRIFICATION DES EXPRESSIONS RÉGULIÈRES (MOTS INTERDITS)
-    int violation_regex = 0;
-    for (int i = 0; i < config->forbidden_count; i++) {
-        printf("Verification du motif Regex : \"%s\"... ", config->forbidden_patterns[i]);
-        
-        if (check_forbidden_regex(texte_utilisateur, config->forbidden_patterns[i])) {
-            printf("[ALERTE] Motif interdit detecte !\n");
-            violation_regex = 1;
-        } else {
-            printf("[OK]\n");
-        }
+    printf("=== RuleSet: %s ===\n\n", path);
+    printf("Type document : %s\n", ruleset->meta.document_type);
+    printf("Version       : %s\n", ruleset->meta.version);
+    printf("Regles chargees : %d\n\n", ruleset->rule_count);
+
+    for (int i = 0; i < ruleset->rule_count; i++) {
+        const Rule *rule = &ruleset->rules[i];
+        printf("  %s | %-18s | %s\n", rule->id, rule->check_type, rule->description);
     }
 
-    if (violation_regex) {
-        texte_conforme = 0;
+    char sample[8192];
+    size_t offset = 0;
+    offset += (size_t)snprintf(sample + offset, sizeof(sample) - offset,
+        "Introduction\n"
+        "Ce memoire presente notre travail de recherche sur l'edition intelligente.\n");
+    for (int w = 0; w < 310 && offset < sizeof(sample) - 16; w++) {
+        offset += (size_t)snprintf(sample + offset, sizeof(sample) - offset, "mot%d ", w);
+    }
+    snprintf(sample + offset, sizeof(sample) - offset,
+        "\nConclusion\nBibliographie\n");
+
+    ruleset_evaluate(ruleset, sample);
+
+    printf("\n=== Evaluation ===\n");
+    int ok = ruleset_count_by_status(ruleset, STATUS_OK);
+    int err = ruleset_count_by_status(ruleset, STATUS_ERROR);
+    int warn = ruleset_count_by_status(ruleset, STATUS_WARNING);
+    int pending = ruleset_count_by_status(ruleset, STATUS_PENDING);
+
+    for (int i = 0; i < ruleset->rule_count; i++) {
+        const Rule *rule = &ruleset->rules[i];
+        printf("[%s] %s — %s\n",
+               rule_status_icon(rule->status),
+               rule->id,
+               rule_status_label(rule->status));
     }
 
-    // 4. VERDICT FINAL DU MOTEUR DE RECHERCHE
-    printf("\n--------------------------------------------------\n");
-    if (texte_conforme) {
-        printf("VERDICT FINAL : [SUCCES] Le texte respecte toutes les regles du document.\n");
-    } else {
-        printf("VERDICT FINAL : [ECHEC] Le texte viole une ou plusieurs regles metier.\n");
+    printf("\nConformite : %d OK, %d erreur(s), %d avertissement(s), %d en attente\n",
+           ok, err, warn, pending);
+
+    if (ruleset->rule_count < 9) {
+        ruleset_free(ruleset);
+        return 1;
     }
-    printf("--------------------------------------------------\n");
 
-    // 5. Nettoyage complet de la mémoire RAM
-    free_config(config);
-
-    return 0;
+    int result = (ok > 0) ? 0 : 1;
+    ruleset_free(ruleset);
+    return result;
 }
