@@ -603,13 +603,50 @@ void on_format_underline_clicked(GtkWidget *widget, gpointer data) {
 }
 
 void on_format_font_size_changed(GtkComboBox *widget, gpointer data) {
-    (void)widget; (void)data;
-    printf("[Format] Font size changed\n");
+    AppWidgets *app = (AppWidgets *)data;
+    if (!app || !app->editor_buffer) return;
+
+    GtkComboBoxText *combo_box = GTK_COMBO_BOX_TEXT(widget);
+    gchar *font_size_str = gtk_combo_box_text_get_active_text(combo_box);
+    if (font_size_str == NULL) return;
+
+    printf("[Format] Font size changed to: %s\n", font_size_str);
+
+    int size_points = atoi(font_size_str);
+    if (size_points > 0) {
+        GtkTextBuffer *buffer = GTK_TEXT_BUFFER(app->editor_buffer);
+        GtkTextIter start, end;
+
+        if (gtk_text_buffer_get_selection_bounds(buffer, &start, &end)) {
+            GtkTextTag *size_tag = gtk_text_buffer_create_tag(buffer, NULL, 
+                                                              "size", size_points * PANGO_SCALE, 
+                                                              NULL);
+            gtk_text_buffer_apply_tag(buffer, size_tag, &start, &end);
+        }
+    }
+    g_free(font_size_str);
 }
 
 void on_format_font_family_changed(GtkComboBox *widget, gpointer data) {
-    (void)widget; (void)data;
-    printf("[Format] Font family changed\n");
+    AppWidgets *app = (AppWidgets *)data;
+    if (!app || !app->editor_buffer) return;
+
+    GtkComboBoxText *combo_box = GTK_COMBO_BOX_TEXT(widget);
+    gchar *font_family = gtk_combo_box_text_get_active_text(combo_box);
+    if (font_family == NULL) return;
+
+    printf("[Format] Font family changed to: %s\n", font_family);
+
+    GtkTextBuffer *buffer = GTK_TEXT_BUFFER(app->editor_buffer);
+    GtkTextIter start, end;
+
+    if (gtk_text_buffer_get_selection_bounds(buffer, &start, &end)) {
+        GtkTextTag *font_tag = gtk_text_buffer_create_tag(buffer, NULL, 
+                                                          "family", font_family, 
+                                                          NULL);
+        gtk_text_buffer_apply_tag(buffer, font_tag, &start, &end);
+    }
+    g_free(font_family);
 }
 
 void on_format_align_left_clicked(GtkWidget *widget, gpointer data) {
