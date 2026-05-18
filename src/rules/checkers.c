@@ -1,38 +1,79 @@
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <string.h>
 #include "rules/rules.h"
 
-/* * count_words : Parcourt le texte caractère par caractère.
- * Un mot est détecté quand on passe d'un espace à un caractère visible.
-  * Cette fonction est robuste face aux espaces multiples.
-   */
+// ============================================================================
+// 1. VÉRIFICATION DES EXPRESSIONS RÉGULIÈRES (PCRE2)
+// ============================================================================
+int check_forbidden_regex(const char *text, const char *pattern) {
+    if (!text || !pattern) return 0;
+
+    pcre2_code *re;
+    int errornumber;
+    PCRE2_SIZE erroroffset;
+    
+    re = pcre2_compile(
+        (PCRE2_SPTR)pattern,
+        PCRE2_ZERO_TERMINATED,
+        PCRE2_CASELESS,
+        &errornumber,
+        &erroroffset,
+        NULL
+    );
+    
+    if (re == NULL) {
+        PCRE2_UCHAR buffer[256];
+        pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
+        printf("Erreur Regex pour '%s': %s\n", pattern, buffer);
+        return 0;
+    }
+
+    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(re, NULL);
+    
+    int rc = pcre2_match(
+        re,
+        (PCRE2_SPTR)text,
+        strlen(text),
+        0,
+        0,
+        match_data,
+        NULL
+    );
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+
+    return (rc >= 0);
+}
+
+// ============================================================================
+// 2. COMPTAGE ET VÉRIFICATION DES MOTS
+// ============================================================================
 int count_words(const char *text) {
-	if (text == NULL) return 0; // Sécurité : évite de crasher si le texte est vide
+    if (!text) return 0;
 
-    		   int count = 0;
-   	    	   int in_word = 0; // Drapeau (flag) : 1 si on est à l'intérieur d'un mot
+    int count = 0;
+    int in_word = 0;
 
-   	           while (*text) {
-   	           	if (isspace(*text)) {
-   	            	in_word = 0; // On a trouvé un espace, on n'est plus dans un mot
-   	                	        	} 
-   	            else if (!in_word) {
-   	            	in_word = 1; // On passe d'un espace à un caractère : nouveau mot trouvé
-   	              	count++;
-   	                	           }
-   	                  text++; // On passe au caractère suivant (arithmétique de pointeurs)
-   	                         }
-   	            return count;
-   	                              }
+    while (*text) {
+        // Détection des espaces, tabulations et retours à la ligne
+        if (*text == ' ' || *text == '\t' || *text == '\n' || *text == '\r') {
+            in_word = 0;
+        } 
+        // Début d'un nouveau mot détecté
+        else if (!in_word) {
+            in_word = 1;
+            count++;
+        }
+        text++;
+    }
+    return count;
+}
 
-/* * check_word_count_min : Vérifie si le texte atteint le quota de mots.
-* Renvoie STATUS_OK si conforme, sinon STATUS_ERROR.
-*/
-RuleStatus check_word_count_min(const char *text, int min_required) {
-	int current_count = count_words(text);
-
- 	if (current_count >= min_required) {
-    	return STATUS_OK;
- 	} else {
-    	return STATUS_ERROR;
-   	       } }
+int check_word_count_min(const char *text, int min_words) {
+    int current_count = count_words(text);
+    // Renvoie 1 si le nombre de mots est suffisant, 0 sinon
+    return (current_count >= min_words);
+}
