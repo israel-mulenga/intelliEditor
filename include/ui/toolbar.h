@@ -5,6 +5,6 @@
 #include "window.h"
 
 /* Création de la barre d’outils */
-GtkWidget* create_toolbar(AppWidgets *app_widgets);
+GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group);
 
 #endif

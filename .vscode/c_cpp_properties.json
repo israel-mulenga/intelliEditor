@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/include",
+                "${workspaceFolder}/deps/cjson",
                 "/usr/include/gtk-3.0",
                 "/usr/include/glib-2.0",
                 "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
@@ -13,7 +14,8 @@
                 "/usr/include/atk-1.0",
                 "/usr/include/gtksourceview-4",
                 "${workspaceFolder}",
-                "/usr/include/harfbuzz"
+                "/usr/include/harfbuzz",
+                "/usr/include/gtksourceview-4/gtksource.h"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11"

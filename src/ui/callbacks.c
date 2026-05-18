@@ -1,6 +1,7 @@
 #include "ui/callbacks.h"
 #include "ui/window.h"
 #include "editor/file_manager.h"
+#include "llm/llm_bridge.h"
 #include <stdio.h>
 
 // ======================================
@@ -149,6 +150,8 @@ static void save_to_path(AppWidgets *app, const gchar *filename, gboolean update
         g_free(app->current_file_path);
         app->current_file_path = g_strdup(filename);
     }
+
+    app_autosave_reschedule(app);
 }
 
 // Called when "Correct" button is clicked
@@ -165,6 +168,34 @@ void on_rewrite_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
     (void)data;
     printf("Rewrite button clicked\n");
+}
+
+// Wrapper to call LLM bridge rephrase using current app widgets
+void on_llm_rewrite_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app_widgets = (AppWidgets *)data;
+    if (!app_widgets) return;
+
+    AppContext ctx;
+    ctx.source_view = GTK_SOURCE_VIEW(app_widgets->editor_view);
+    ctx.statusbar = app_widgets->statusbar;
+    ctx.sidebar = app_widgets->sidebar;
+
+    llm_bridge_on_write_clicked(widget, &ctx);
+}
+
+// Wrapper to call LLM bridge grammar check using current app widgets
+void on_llm_grammar_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app_widgets = (AppWidgets *)data;
+    if (!app_widgets) return;
+
+    AppContext ctx;
+    ctx.source_view = GTK_SOURCE_VIEW(app_widgets->editor_view);
+    ctx.statusbar = app_widgets->statusbar;
+    ctx.sidebar = app_widgets->sidebar;
+
+    llm_bridge_on_gramma_clicked(widget, &ctx);
 }
 
 // Called when the welcome screen "Ouvrir l'éditeur" button is clicked
@@ -218,6 +249,7 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data) {
 
             g_free(app->current_file_path);
             app->current_file_path = g_strdup(filename);
+            app_autosave_reschedule(app);
         } else {
             g_printerr("Unable to import file: %s\n", filename);
         }
@@ -231,6 +263,7 @@ void on_file_import_clicked(GtkWidget *widget, gpointer data) {
         gtk_widget_grab_focus(app->editor_view);
     }
 }
+
 
 void on_file_save_clicked(GtkWidget *widget, gpointer data) {
     (void)widget;
@@ -302,4 +335,145 @@ void on_text_deleted(GtkTextBuffer *textbuffer, GtkTextIter *start,
     for (gint i = 0; i < len; i++) {
         gap_buffer_delete(app->gb);
     }
+}
+
+void on_edit_undo_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget; // GTK passe le widget clique, mais on ne l'utilise pas ici
+    AppWidgets *app = (AppWidgets *)data;
+    
+    // Déconnecte temporairement les gestionnaires pour éviter les boucles
+    g_signal_handler_disconnect(app->editor_buffer, app->insert_handler_id);
+    g_signal_handler_disconnect(app->editor_buffer, app->delete_handler_id);
+    
+    gap_buffer_undo(app->gb); // Restaure l'état précédent du buffer
+    // Met à jour l'affichage dans l'éditeur GTK
+    char *content = gap_buffer_get_content(app->gb);
+    if (content) {
+        gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app->editor_buffer), content, -1);
+        free(content);
+    }
+    
+    // Reconnecte les gestionnaires
+    app->insert_handler_id = g_signal_connect(app->editor_buffer, "insert-text",
+                    G_CALLBACK(on_text_inserted), app);
+    app->delete_handler_id = g_signal_connect(app->editor_buffer, "delete-range",
+                    G_CALLBACK(on_text_deleted), app);
+}
+
+void on_edit_redo_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    
+    // Déconnecte temporairement les gestionnaires pour éviter les boucles
+    g_signal_handler_disconnect(app->editor_buffer, app->insert_handler_id);
+    g_signal_handler_disconnect(app->editor_buffer, app->delete_handler_id);
+    
+    gap_buffer_redo(app->gb); // Restaure l'état suivant du buffer
+    char *content = gap_buffer_get_content(app->gb);
+    if (content) {
+        gtk_text_buffer_set_text(GTK_TEXT_BUFFER(app->editor_buffer), content, -1);
+        free(content);
+    }
+    
+    // Reconnecte les gestionnaires
+    app->insert_handler_id = g_signal_connect(app->editor_buffer, "insert-text",
+                    G_CALLBACK(on_text_inserted), app);
+    app->delete_handler_id = g_signal_connect(app->editor_buffer, "delete-range",
+                    G_CALLBACK(on_text_deleted), app);
+}
+
+void on_edit_select_all_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        GtkTextIter start, end;
+        gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(app->editor_buffer), &start);
+        gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(app->editor_buffer), &end);
+        gtk_text_buffer_select_range(GTK_TEXT_BUFFER(app->editor_buffer), &start, &end);
+    }
+}
+
+void on_edit_cut_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        gtk_text_buffer_cut_clipboard(GTK_TEXT_BUFFER(app->editor_buffer), gtk_clipboard_get(GDK_SELECTION_CLIPBOARD), TRUE);
+    }
+}
+
+void on_edit_copy_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        gtk_text_buffer_copy_clipboard(GTK_TEXT_BUFFER(app->editor_buffer), gtk_clipboard_get(GDK_SELECTION_CLIPBOARD));
+    }
+}
+
+void on_edit_paste_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    if (app->editor_buffer) {
+        gtk_text_buffer_paste_clipboard(GTK_TEXT_BUFFER(app->editor_buffer), gtk_clipboard_get(GDK_SELECTION_CLIPBOARD), NULL, TRUE);
+    }
+}
+
+void on_edit_find_clicked(GtkWidget *widget, gpointer data) {
+    (void)widget;
+    AppWidgets *app = (AppWidgets *)data;
+    // For now, just show a message. In a full implementation, open a find dialog.
+    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(app->window),
+        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+        "Find functionality not yet implemented.");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
+void on_view_toggle_horizontal_ruler_clicked(GtkWidget *widget, gpointer data) {
+    AppWidgets *app = (AppWidgets *)data;
+    gboolean active = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    if (!app || !app->horizontal_ruler) {
+        return;
+    }
+    if (active) {
+        gtk_widget_show(app->horizontal_ruler);
+    } else {
+        gtk_widget_hide(app->horizontal_ruler);
+    }
+}
+
+void on_view_toggle_vertical_ruler_clicked(GtkWidget *widget, gpointer data) {
+    AppWidgets *app = (AppWidgets *)data;
+    gboolean active = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+    if (!app || !app->vertical_ruler) {
+        return;
+    }
+    if (active) {
+        gtk_widget_show(app->vertical_ruler);
+    } else {
+        gtk_widget_hide(app->vertical_ruler);
+    }
+}
+
+void on_file_new_page_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app_widgets = (AppWidgets *)data;
+
+    append_new_page_to_current_document(app_widgets);
+}
+
+void on_file_new_document_clicked(GtkWidget *widget, gpointer data)
+{
+    (void)widget;
+
+    AppWidgets *app_widgets = (AppWidgets *)data;
+
+    static int doc_count = 2;
+
+    gchar title[64];
+
+    sprintf(title, "Document %d", doc_count++);
+
+    create_new_tab(app_widgets, title);
 }

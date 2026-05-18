@@ -1,6 +1,6 @@
+
 {
-	    "min_words": 100
-	    }
-	    
+    "min_words": 5,
+    "forbidden_patterns": ["secret", "invalide", "hack"]
 }
 
