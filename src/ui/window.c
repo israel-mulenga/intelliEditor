@@ -6,6 +6,7 @@
 #include "llm/llm_client.h"
 #include "editor/gap_buffer.h"
 #include <hunspell/hunspell.h>
+#include <pango/pango.h>
 
 /* =========================================================
    PROTOTYPES INTERNES (usage uniquement dans ce fichier)
@@ -14,6 +15,7 @@ static void setup_css(void);
 static void init_hunspell(AppWidgets *app_widgets);
 static void cleanup_app_widgets(GtkWidget *widget, gpointer data);
 static GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_group);
+static gboolean on_window_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data);
 static gboolean draw_horizontal_ruler(
     GtkWidget *widget,
     cairo_t *cr,
@@ -97,6 +99,9 @@ void create_main_window(GtkApplication *app, gpointer user_data) {
 
     gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "welcome");
+
+    /* ================= SQUELETTE RACCOURCIS CLAVIER ================= */
+    g_signal_connect(window, "key-press-event", G_CALLBACK(on_window_key_press), app_widgets);
 
     /* ================= SIGNAL CLEANUP ================= */
     g_signal_connect(window, "destroy",
@@ -208,6 +213,9 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     /* ================= TOOLBAR ================= */
     GtkWidget *toolbar = create_toolbar(app_widgets, accel_group);
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+/* ================= FORMAT TOOLBAR ================= */
+    GtkWidget *format_toolbar = create_format_toolbar(app_widgets);
+    gtk_box_pack_start(GTK_BOX(vbox), format_toolbar, FALSE, FALSE, 0);
 
     /* ================= NOTEBOOK ================= */
     GtkWidget *notebook = gtk_notebook_new();
@@ -277,6 +285,14 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
     app_widgets->editor_buffer = GTK_SOURCE_BUFFER(
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(editor))
     );
+
+    /* Create formatting tags */
+    gtk_text_buffer_create_tag(GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        "bold", "weight", PANGO_WEIGHT_BOLD, NULL);
+    gtk_text_buffer_create_tag(GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        "italic", "style", PANGO_STYLE_ITALIC, NULL);
+    gtk_text_buffer_create_tag(GTK_TEXT_BUFFER(app_widgets->editor_buffer),
+        "underline", "underline", PANGO_UNDERLINE_SINGLE, NULL);
 
     /* Connect text buffer handlers to keep gap buffer in sync */
     app_widgets->insert_handler_id = g_signal_connect(app_widgets->editor_buffer,
@@ -401,15 +417,12 @@ static void setup_css(void) {
         "    border: none;"
         "    font-family: 'Calibri', 'Arial', sans-serif;"
         "    font-size: 14px;"
-        "    line-height: 1.5;"
         "}"
 
         "textview text {"
         "    background-color: #ffffff;"
         "    color: #1e1e1e;"
         "    caret-color: #111111;"
-        "    selection-background-color: #0078d4;"
-        "    selection-color: #ffffff;"
         "}"
 
         "#horizontal-ruler {"
@@ -475,6 +488,25 @@ static void setup_css(void) {
         "#vertical-ruler {"
         "   background-color: #f8fafc;"
         "   border-right: 1px solid #cbd5e1;"
+        "}"
+
+        /* ===== FORMAT TOOLBAR ===== */
+        "#format-toolbar {"
+        "   background-color: #f8fafc;"
+        "   border-bottom: 1px solid #cbd5e1;"
+        "   padding: 6px;"
+        "}"
+
+        "#format-button {"
+        "   background-color: white;"
+        "   border: 1px solid #d1d5db;"
+        "   border-radius: 4px;"
+        "   min-width: 32px;"
+        "   min-height: 32px;"
+        "}"
+
+        "#format-button:hover {"
+        "   background-color: #e2e8f0;"
         "}";
         
 
@@ -642,5 +674,145 @@ static gboolean draw_vertical_ruler(
         }
     }
 
+    return FALSE;
+}
+
+/* =========================================================
+   GESTIONNAIRE GLOBAL DES RACCOURCIS CLAVIER (ACCÉLÉRATEURS)
+   ========================================================= */
+static gboolean on_window_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
+    AppWidgets *app = (AppWidgets *)data;
+    if (!app) return FALSE;
+
+    // Récupération de l'état des touches modificatrices
+    gboolean ctrl = (event->state & GDK_CONTROL_MASK) != 0;
+    gboolean shift = (event->state & GDK_SHIFT_MASK) != 0;
+
+    /* =========================================================
+       MENU FICHIER (FILE)
+       ========================================================= */
+    // Ctrl + N : Nouveau Document
+    if (ctrl && !shift && event->keyval == GDK_KEY_n) {
+        on_file_new_document_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + Shift + N : Nouvelle Page
+    if (ctrl && shift && event->keyval == GDK_KEY_N) {
+        on_file_new_page_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + O : Importer / Ouvrir
+    if (ctrl && !shift && event->keyval == GDK_KEY_o) {
+        on_file_import_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + S : Sauvegarder
+    if (ctrl && !shift && event->keyval == GDK_KEY_s) {
+        on_file_save_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + Shift + S : Enregistrer sous
+    if (ctrl && shift && event->keyval == GDK_KEY_S) {
+        on_file_save_as_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + Q : Quitter l'application
+    if (ctrl && !shift && event->keyval == GDK_KEY_q) {
+        on_quit_clicked(NULL, app);
+        return TRUE;
+    }
+
+    /* =========================================================
+       MENU ÉDITION (EDIT)
+       ========================================================= */
+    // Ctrl + Z : Annuler (Undo)
+    if (ctrl && !shift && event->keyval == GDK_KEY_z) {
+        on_edit_undo_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + Y : Rétablir (Redo)
+    if (ctrl && !shift && event->keyval == GDK_KEY_y) {
+        on_edit_redo_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + X : Couper (Cut)
+    if (ctrl && !shift && event->keyval == GDK_KEY_x) {
+        on_edit_cut_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + C : Copier (Copy)
+    if (ctrl && !shift && event->keyval == GDK_KEY_c) {
+        on_edit_copy_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + V : Coller (Paste)
+    if (ctrl && !shift && event->keyval == GDK_KEY_v) {
+        on_edit_paste_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + A : Tout Sélectionner
+    if (ctrl && !shift && event->keyval == GDK_KEY_a) {
+        on_edit_select_all_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + F : Rechercher
+    if (ctrl && !shift && event->keyval == GDK_KEY_f) {
+        on_edit_find_clicked(NULL, app);
+        return TRUE;
+    }
+
+    /* =========================================================
+       MENU FORMAT
+       ========================================================= */
+    // Ctrl + B : Gras (Bold)
+    if (ctrl && !shift && event->keyval == GDK_KEY_b) {
+        on_format_bold_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + I : Italique (Italic)
+    if (ctrl && !shift && event->keyval == GDK_KEY_i) {
+        on_format_italic_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + U : Souligné (Underline)
+    if (ctrl && !shift && event->keyval == GDK_KEY_u) {
+        on_format_underline_clicked(NULL, app);
+        return TRUE;
+    }
+
+    /* =========================================================
+       OUTILS (TOOLS) & ASSISTANT IA (LLM)
+       ========================================================= */
+    // Ctrl + K : Réécriture IA (LLM)
+    if (ctrl && !shift && event->keyval == GDK_KEY_k) {
+        on_llm_rewrite_clicked(NULL, app);
+        return TRUE;
+    }
+    // Ctrl + Shift + G : Correction Grammaire IA (LLM)
+    if (ctrl && shift && event->keyval == GDK_KEY_G) {
+        on_llm_grammar_clicked(NULL, app);
+        return TRUE;
+    }
+    // F7 : Correction orthographique (Hunspell)
+    if (!ctrl && !shift && event->keyval == GDK_KEY_F7) {
+        on_tools_spellcheck_clicked(NULL, app);
+        return TRUE;
+    }
+
+    /* =========================================================
+       AFFICHAGE (WINDOW & HELP)
+       ========================================================= */
+    // F11 : Mode Plein écran
+    if (!ctrl && !shift && event->keyval == GDK_KEY_F11) {
+        on_window_fullscreen_clicked(NULL, app);
+        return TRUE;
+    }
+    // F1 : Contenu de l'aide
+    if (!ctrl && !shift && event->keyval == GDK_KEY_F1) {
+        on_help_contents_clicked(NULL, app);
+        return TRUE;
+    }
+
+    // Signale à GTK qu'on n'a pas intercepté la touche (permet d'écrire normalement)
     return FALSE;
 }

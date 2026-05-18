@@ -29,9 +29,9 @@
             <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-300">
                 <a href="#hero" class="nav-link hover:text-white transition">Accueil</a>
                 <a href="#features" class="nav-link hover:text-white transition">Fonctionnalités</a>
-                <a href="#team" class="nav-link hover:text-white transition">Notre équipe</a>
                 <a href="#menus" class="nav-link hover:text-white transition">Documentation</a>
                 <a href="#faq" class="nav-link hover:text-white transition">FAQ</a>
+                <a href="#team" class="nav-link hover:text-white transition">Notre équipe</a>
             </div>
             <div class="hidden md:block w-10"></div>
         </div>
@@ -109,52 +109,225 @@
     </section>
 
     <section id="features" class="bg-white py-12 border-b border-slate-100">
-        <div class="max-w-screen-xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            
-            <div class="flex items-center space-x-4 p-2">
-                <div class="bg-blue-50 text-blue-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
-                    <i class="fa-solid fa-pen"></i>
+        <div class="max-w-screen-xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <p class="text-accent font-bold text-xs tracking-widest uppercase mb-2">FEATURES</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Fonctionnalités d'IntelliEditor</h2>
+                <p class="text-slate-500 text-sm md:text-base mt-3 max-w-2xl mx-auto">Toutes les fonctionnalités du logiciel sont décrites ici, onglet par onglet, avec les raccourcis clavier disponibles pour aller plus vite.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Fichier</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Gérez vos documents avec des commandes essentielles : création de nouveaux documents et pages, ouverture, sauvegarde et enregistrement sous un autre nom.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Nouveau document / nouvelle page</li>
+                        <li>Ouvrir un fichier</li>
+                        <li>Enregistrer</li>
+                        <li>Enregistrer sous</li>
+                    </ul>
                 </div>
-                <div>
-                    <h3 class="font-bold text-sm text-slate-900">Édition avancée</h3>
-                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">Outils puissants pour une mise en forme professionnelle.</p>
+
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Édition</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Modifiez votre texte rapidement grâce aux actions d'annulation, rétablissement et gestion du presse-papiers.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Annuler / Refaire</li>
+                        <li>Couper, Copier, Coller</li>
+                        <li>Sélectionner tout</li>
+                        <li>Rechercher</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Affichage</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Personnalisez l'espace de travail avec des repères visuels et activez le mode plein écran pour une écriture sans distraction.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Afficher / masquer règle horizontale</li>
+                        <li>Afficher / masquer règle verticale</li>
+                        <li>Basculer en plein écran</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Insertion</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Insérez facilement des éléments structurés dans votre document, depuis des images jusqu'aux tableaux et notes.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Insérer la date</li>
+                        <li>Insérer une image</li>
+                        <li>Insérer un tableau</li>
+                        <li>Insérer un lien, un en-tête, un pied de page ou un saut de page</li>
+                        <li>Ajouter un commentaire</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Format</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Appliquez rapidement du style à votre texte avec des options de mise en forme et d'alignement.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Gras, italique, souligné</li>
+                        <li>Alignement gauche, centre, droite, justifié</li>
+                        <li>Choix de police et taille</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Outils</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Analysez votre texte et adaptez votre expérience avec des outils de compte, de correction et de préférences.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Compteur de mots et de caractères</li>
+                        <li>Correcteur orthographique</li>
+                        <li>Préférences d'interface</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Onglet Aide</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Accédez à l'aide, aux informations sur l'application et à la liste des raccourcis intégrés.</p>
+                    <ul class="list-disc list-inside text-slate-700 text-sm space-y-2">
+                        <li>Contenu de l'aide</li>
+                        <li>À propos</li>
+                        <li>Affichage des raccourcis clavier</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4 p-2">
-                <div class="bg-indigo-50 text-indigo-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
-                    <i class="fa-solid fa-list-ul"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm text-slate-900">Productivité</h3>
-                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">Conçu pour améliorer votre efficacité au quotidien.</p>
+            <div class="mt-10 bg-slate-900 text-white rounded-3xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h3 class="font-semibold text-lg">Raccourcis clavier</h3>
+                        <p class="text-slate-300 text-sm mt-1">Utilisez ces raccourcis pour accélérer votre édition.</p>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-slate-200">
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+N</span>
+                            <div>Nouveau document</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+O</span>
+                            <div>Ouvrir fichier</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+S</span>
+                            <div>Enregistrer</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+Shift+S</span>
+                            <div>Enregistrer sous</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+Z</span>
+                            <div>Annuler</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+Y</span>
+                            <div>Refaire</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+X</span>
+                            <div>Couper</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+C</span>
+                            <div>Copier</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+V</span>
+                            <div>Coller</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+A</span>
+                            <div>Sélectionner tout</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">Ctrl+F</span>
+                            <div>Rechercher</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">F7</span>
+                            <div>Correction orthographique</div>
+                        </div>
+                        <div class="bg-slate-800 rounded-2xl p-3">
+                            <span class="font-semibold">F11</span>
+                            <div>Plein écran</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="flex items-center space-x-4 p-2">
-                <div class="bg-blue-50 text-blue-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm text-slate-900">Fiabilité</h3>
-                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">Stable, sécurisé et respectueux de vos données.</p>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-4 p-2">
-                <div class="bg-violet-50 text-violet-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
-                    <i class="fa-solid fa-rocket"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm text-slate-900">Innovation</h3>
-                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">En constante évolution grâce à des idées nouvelles.</p>
-                </div>
-            </div>
-
         </div>
     </section>
 
-    <section class="bg-slate-50/50 py-16">
+    <section id="menus" class="bg-white py-16 border-t border-slate-100">
+        <div class="max-w-screen-xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <p class="text-accent font-bold text-xs tracking-widest uppercase mb-2">DOCUMENTATION</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Navigation des onglets</h2>
+                <p class="text-slate-500 text-sm md:text-base mt-3 max-w-2xl mx-auto">Retrouvez ici une vue d'ensemble de chaque section du menu et de ce qu'elle permet de faire.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">File</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Gérez vos documents : importer, créer une nouvelle page ou un nouveau document, sauvegarder et enregistrer sous.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Edit</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Travaillez sur le texte avec annuler, refaire, couper, copier, coller, sélectionner tout et recherche.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">View</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Affichez ou masquez les règles horizontale et verticale pour mieux structurer votre document.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Insert</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Insérez rapidement des images, tableaux, dates, liens, en-têtes, pieds de page ou sauts de page.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Format</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Appliquez du gras, italique, souligné ou alignez le texte à gauche, centre ou droite.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Tools</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Utilisez le compteur de mots, le correcteur orthographique et les préférences pour ajuster l'application.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 p-6 shadow-sm md:col-span-3">
+                    <h3 class="font-semibold text-slate-900 mb-3">Help</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">Accédez au guide d'aide et à la fenêtre À propos pour obtenir des informations sur IntelliEditor.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="bg-slate-50/50 py-16 border-t border-slate-100">
+        <div class="max-w-screen-xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <p class="text-accent font-bold text-xs tracking-widest uppercase mb-2">FAQ</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">Questions fréquentes</h2>
+                <p class="text-slate-500 text-sm md:text-base mt-3 max-w-2xl mx-auto">Réponses rapides aux questions courantes sur l'utilisation d'IntelliEditor.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Pourquoi les boutons ne répondent-ils pas ?</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Si une fonctionnalité ne répond pas, vérifiez que l'interface a bien chargé et que l'application n'est pas bloquée par une opération de fond.</p>
+                </div>
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Comment utiliser les raccourcis ?</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Appuyez sur les touches listées dans la section Fonctions pour déclencher rapidement les actions correspondantes.</p>
+                </div>
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">La recherche est-elle disponible ?</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">La fonction de recherche est prévue. Pour l'instant, elle affiche un message d'information et sera améliorée dans une prochaine version.</p>
+                </div>
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-semibold text-slate-900 mb-3">Comment activer le mode plein écran ?</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Utilisez l'onglet Window puis Fullscreen, ou appuyez sur F11 lorsque la fenêtre est active.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="team" class="bg-slate-50/50 py-16">
         <div class="max-w-screen-xl mx-auto px-6">
             
             <div class="text-center mb-12">
@@ -168,13 +341,13 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
                     <div>
-                        <img src="docs/Picture/joyce barhaka.jpeg" alt="Israel" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <img src="Profile_Picture/joyce%20barhaka.jpeg" alt="Israel" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
                         <div class="flex justify-between items-start mb-1">
                             <h3 class="font-bold text-slate-900 text-sm">Israel MULENGA</h3>
                             <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
                         </div>
-                        <p class="text-accent text-xs font-semibold mb-3">Chef de projet & Développeur</p>
-                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Passionné par le développement logiciel et les interfaces intuitives. Il a supervisé l'architecture globale du projet.</p>
+                        <p class="text-accent text-xs font-semibold mb-3">Chef de projet & Développeur D</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Passionné par le développement logiciel et les interfaces intuitives. Il a supervisé l'architecture globale du projet et est responsable de l'intégration, des tests et de l'optimisation générale de l'application.</p>
                     </div>
                     <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
                         <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
@@ -185,29 +358,12 @@
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
                     <div>
-                        <img src="docs/Picture/joyce barhaka.jpeg" alt="Joyce Barhaka" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <img src="Profile_Picture/joyce%20barhaka.jpeg" alt="Joyce Barhaka" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
                         <div class="flex justify-between items-start mb-1">
                             <h3 class="font-bold text-slate-900 text-sm">Joyce BARHAKA</h3>
                             <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
                         </div>
-                        <p class="text-accent text-xs font-semibold mb-3">Développeur Backend</p>
-                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Spécialiste en logique métier et en traitement de documents. Il a construit le moteur intelligent d'IntelliEditor.</p>
-                    </div>
-                    <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
-                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
-                        <a href="#" class="hover:text-blue-600 transition text-sm"><i class="fa-brands fa-linkedin"></i></a>
-                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-solid fa-envelope"></i></a>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
-                    <div>
-                        <img src="docs/Picture/joyce barhaka.jpeg" alt="Jiresse" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 class="font-bold text-slate-900 text-sm">Jiresse</h3>
-                            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
-                        </div>
-                        <p class="text-accent text-xs font-semibold mb-3">Jiresse ALFRED</p>
+                        <p class="text-accent text-xs font-semibold mb-3">Développeur B</p>
                         <p class="text-slate-500 text-xs mb-6 leading-relaxed">Expert en interfaces utilisateur, il a veillé à offrir une expérience moderne, fluide et agréable.</p>
                     </div>
                     <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
@@ -219,13 +375,30 @@
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
                     <div>
-                        <img src="docs/Picture/david shimatu.jpeg" alt="David SHIMATU" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <img src="Profile_Picture/joyce%20barhaka.jpeg" alt="Jiresse" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-slate-900 text-sm">Jiresse ALFRED</h3>
+                            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
+                        </div>
+                        <p class="text-accent text-xs font-semibold mb-3"> Développeur C</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Expert en IA, il a travaillé sur la partie IA de l'application.</p>
+                    </div>
+                    <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="hover:text-blue-600 transition text-sm"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
+                    <div>
+                        <img src="Profile_Picture/joyce barhaka.jpeg" alt="David SHIMATU" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
                         <div class="flex justify-between items-start mb-1">
                             <h3 class="font-bold text-slate-900 text-sm">David SHIMATU</h3>
                             <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
                         </div>
-                        <p class="text-accent text-xs font-semibold mb-3">Développeur & Intégrateur</p>
-                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Responsable de l'intégration, des tests et de l'optimisation générale de l'application.</p>
+                        <p class="text-accent text-xs font-semibold mb-3">Développeur A</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Spécialiste systèmes .</p>
                     </div>
                     <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
                         <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>

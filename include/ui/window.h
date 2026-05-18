@@ -50,5 +50,6 @@ void append_new_page_to_current_document(AppWidgets *app_widgets);
    ========================================================= */
 void on_correct_clicked(GtkWidget *widget, gpointer data);
 void on_rewrite_clicked(GtkWidget *widget, gpointer data);
+void setup_application_shortcuts(AppWidgets *app);
 
 #endif

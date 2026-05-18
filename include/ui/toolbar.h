@@ -6,5 +6,6 @@
 
 /* Création de la barre d’outils */
 GtkWidget* create_toolbar(AppWidgets *app_widgets, GtkAccelGroup *accel_group);
+GtkWidget* create_format_toolbar(AppWidgets *app_widgets);
 
 #endif
