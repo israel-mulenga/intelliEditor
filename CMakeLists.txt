@@ -161,6 +161,9 @@ add_test(NAME test_config_parser COMMAND test_config_parser)
 add_executable(test_rules tests/test_rules.c)
 target_link_libraries(test_rules PRIVATE rules_engine)
 add_test(NAME test_rules COMMAND test_rules)
+set_tests_properties(test_rules PROPERTIES
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
 
 add_executable(test_llm tests/test_llm.c)
 target_include_directories(test_llm PRIVATE ${GTK3_INCLUDE_DIRS})
