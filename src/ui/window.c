@@ -260,7 +260,16 @@ GtkWidget* create_editor_page(AppWidgets *app_widgets, GtkAccelGroup *accel_grou
 
     app_widgets->notebook = notebook;
 
-    gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, TRUE, 0);
+    /* ================= ZONE DOCUMENT + SIDEBAR (cahier) ================= */
+    GtkWidget *content_paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    app_widgets->sidebar = create_sidebar();
+
+    gtk_paned_pack1(GTK_PANED(content_paned), notebook, TRUE, TRUE);
+    gtk_paned_pack2(GTK_PANED(content_paned), app_widgets->sidebar, FALSE, FALSE);
+    gtk_paned_set_wide_handle(GTK_PANED(content_paned), TRUE);
+    gtk_paned_set_position(GTK_PANED(content_paned), 820);
+
+    gtk_box_pack_start(GTK_BOX(vbox), content_paned, TRUE, TRUE, 0);
 
     /* ================= CONTAINER CENTRÉ ================= */
     GtkWidget *center_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

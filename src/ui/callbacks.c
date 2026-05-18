@@ -1,5 +1,6 @@
 #include "ui/callbacks.h"
 #include "ui/window.h"
+#include "ui/sidebar.h"
 #include "editor/file_manager.h"
 #include "llm/llm_bridge.h"
 #include <stdio.h>
@@ -77,10 +78,7 @@ static void update_sidebar_text(AppWidgets *app_widgets, const gchar *text) {
         return;
     }
 
-    GtkWidget *label = GTK_WIDGET(g_object_get_data(G_OBJECT(app_widgets->sidebar), "sidebar-label"));
-    if (GTK_IS_LABEL(label)) {
-        gtk_label_set_text(GTK_LABEL(label), text);
-    }
+    sidebar_set_summary(app_widgets->sidebar, text);
 }
 
 static void sync_editor_from_gap_buffer(AppWidgets *app_widgets) {
