@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliEditor - À Propos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; }
+        .bg-navy { background-color: #0b1329; }
+        .text-accent { color: #3b82f6; }
+        .bg-accent { background-color: #2563eb; }
+        /* Motif de points en arrière-plan */
+        .dots-bg {
+            background-image: radial-gradient(#ffffff20 2px, transparent 2px);
+            background-size: 15px 15px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
+
+    <nav class="bg-navy text-white px-6 py-4 flex justify-between items-center max-w-full mx-auto border-b border-slate-800">
+        <div class="flex items-center space-x-3 max-w-screen-xl mx-auto w-full justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="bg-accent text-white font-bold rounded p-2 text-lg leading-none">IE</div>
+                <span class="font-bold text-lg tracking-wide">IntelliEditor</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-300">
+                <a href="#hero" class="nav-link hover:text-white transition">Accueil</a>
+                <a href="#features" class="nav-link hover:text-white transition">Fonctionnalités</a>
+                <a href="#team" class="nav-link hover:text-white transition">Notre équipe</a>
+                <a href="#menus" class="nav-link hover:text-white transition">Documentation</a>
+                <a href="#faq" class="nav-link hover:text-white transition">FAQ</a>
+            </div>
+            <div class="hidden md:block w-10"></div>
+        </div>
+    </nav>
+
+    <section id="hero" class="bg-navy text-white overflow-hidden pt-16 pb-20 relative">
+        <div class="max-w-screen-xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+            
+            <div class="lg:col-span-5 flex flex-col justify-center">
+                <p class="text-accent font-bold text-xs tracking-widest uppercase mb-4">À PROPOS D'INTELLIEDITOR</p>
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
+                    Éditer intelligemment, <br>créer librement.
+                </h1>
+                <p class="text-slate-300 text-sm md:text-base leading-relaxed font-light">
+                    IntelliEditor est un éditeur de texte avancé, conçu pour offrir une expérience fluide, puissante et intuitive. Notre mission : aider chacun à écrire, organiser et structurer ses idées avec intelligence.
+                </p>
+            </div>
+
+            <div class="lg:col-span-7 relative flex justify-end">
+                <div class="absolute -right-4 -top-10 w-32 h-40 dots-bg opacity-40 hidden md:block"></div>
+                
+                <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl text-slate-800 overflow-hidden border border-slate-700/50 transform lg:translate-x-6">
+                    <div class="bg-slate-100 px-4 py-2 flex items-center border-b border-slate-200">
+                        <div class="flex space-x-1.5 mr-4">
+                            <span class="w-3 h-3 rounded-full bg-red-400 block"></span>
+                            <span class="w-3 h-3 rounded-full bg-yellow-400 block"></span>
+                            <span class="w-3 h-3 rounded-full bg-green-400 block"></span>
+                        </div>
+                        <div class="text-xs text-slate-500 font-medium mx-auto -translate-x-4">Untitled Document - IntelliEditor</div>
+                    </div>
+                    
+                    <div class="bg-white px-4 py-1.5 border-b border-slate-200 flex space-x-4 text-[11px] text-slate-600 font-medium">
+                        <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Tools</span><span>Help</span>
+                    </div>
+
+                    <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 flex items-center space-x-3 text-xs text-slate-400">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span class="text-slate-300">|</span>
+                        <span class="text-[11px] text-slate-600 bg-white px-2 py-0.5 border border-slate-200 rounded">Segoe UI</span>
+                        <span class="text-[11px] text-slate-600 bg-white px-2 py-0.5 border border-slate-200 rounded">12</span>
+                        <span class="text-slate-300">|</span>
+                        <i class="fa-solid fa-bold text-slate-700"></i>
+                        <i class="fa-solid fa-italic"></i>
+                        <i class="fa-solid fa-underline"></i>
+                        <span class="text-slate-300">|</span>
+                        <i class="fa-solid fa-align-left text-slate-700"></i>
+                        <i class="fa-solid fa-align-center"></i>
+                        <i class="fa-solid fa-align-right"></i>
+                    </div>
+
+                    <div class="flex h-64 text-xs">
+                        <div class="w-1/4 bg-slate-50 border-r border-slate-200 p-3 text-slate-500 space-y-2 font-medium">
+                            <div class="text-slate-800 font-semibold flex justify-between items-center">Document <i class="fa-solid fa-times text-[10px]"></i></div>
+                            <div class="pl-2 pt-1 text-slate-700 bg-slate-200/60 rounded p-1">Heading 1</div>
+                            <div class="pl-2 text-slate-500">Heading 2</div>
+                        </div>
+                        <div class="w-3/4 p-6 overflow-y-auto">
+                            <h2 class="text-base font-bold text-slate-900 mb-2">Bienvenue dans IntelliEditor</h2>
+                            <p class="text-slate-600 leading-relaxed mb-4 text-[11px]">
+                                IntelliEditor est un éditeur de texte moderne et puissant. Il offre toutes les fonctionnalités nécessaires pour écrire, modifier et structurer vos documents efficacement.
+                            </p>
+                            <ul class="space-y-2 text-[11px] text-slate-700 font-medium">
+                                <li class="flex items-center text-emerald-600"><i class="fa-solid fa-circle-check mr-2"></i> <span class="text-slate-700">Interface moderne et épurée</span></li>
+                                <li class="flex items-center text-emerald-600"><i class="fa-solid fa-circle-check mr-2"></i> <span class="text-slate-700">Formatage avancé</span></li>
+                                <li class="flex items-center text-emerald-600"><i class="fa-solid fa-circle-check mr-2"></i> <span class="text-slate-700">Insertion d'images, tableaux et liens</span></li>
+                                <li class="flex items-center text-emerald-600"><i class="fa-solid fa-circle-check mr-2"></i> <span class="text-slate-700">Support de l'export PDF</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="bg-white py-12 border-b border-slate-100">
+        <div class="max-w-screen-xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+            <div class="flex items-center space-x-4 p-2">
+                <div class="bg-blue-50 text-blue-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
+                    <i class="fa-solid fa-pen"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Édition avancée</h3>
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">Outils puissants pour une mise en forme professionnelle.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4 p-2">
+                <div class="bg-indigo-50 text-indigo-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
+                    <i class="fa-solid fa-list-ul"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Productivité</h3>
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">Conçu pour améliorer votre efficacité au quotidien.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4 p-2">
+                <div class="bg-blue-50 text-blue-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Fiabilité</h3>
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">Stable, sécurisé et respectueux de vos données.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4 p-2">
+                <div class="bg-violet-50 text-violet-600 p-4 rounded-xl text-xl flex items-center justify-center w-12 h-12 shrink-0">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Innovation</h3>
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">En constante évolution grâce à des idées nouvelles.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="bg-slate-50/50 py-16">
+        <div class="max-w-screen-xl mx-auto px-6">
+            
+            <div class="text-center mb-12">
+                <p class="text-accent font-bold text-xs tracking-widest uppercase mb-2">NOTRE ÉQUIPE</p>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 inline-block relative pb-3">
+                    Les développeurs derrière IntelliEditor
+                    <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-accent rounded"></span>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
+                    <div>
+                        <img src="docs/Picture/joyce barhaka.jpeg" alt="Israel" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-slate-900 text-sm">Israel MULENGA</h3>
+                            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
+                        </div>
+                        <p class="text-accent text-xs font-semibold mb-3">Chef de projet & Développeur</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Passionné par le développement logiciel et les interfaces intuitives. Il a supervisé l'architecture globale du projet.</p>
+                    </div>
+                    <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="hover:text-blue-600 transition text-sm"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
+                    <div>
+                        <img src="docs/Picture/joyce barhaka.jpeg" alt="Joyce Barhaka" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-slate-900 text-sm">Joyce BARHAKA</h3>
+                            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
+                        </div>
+                        <p class="text-accent text-xs font-semibold mb-3">Développeur Backend</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Spécialiste en logique métier et en traitement de documents. Il a construit le moteur intelligent d'IntelliEditor.</p>
+                    </div>
+                    <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="hover:text-blue-600 transition text-sm"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
+                    <div>
+                        <img src="docs/Picture/joyce barhaka.jpeg" alt="Jiresse" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-slate-900 text-sm">Jiresse</h3>
+                            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
+                        </div>
+                        <p class="text-accent text-xs font-semibold mb-3">Jiresse ALFRED</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Expert en interfaces utilisateur, il a veillé à offrir une expérience moderne, fluide et agréable.</p>
+                    </div>
+                    <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="hover:text-blue-600 transition text-sm"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between">
+                    <div>
+                        <img src="docs/Picture/david shimatu.jpeg" alt="David SHIMATU" class="w-full h-48 object-cover rounded-xl mb-4 bg-slate-100">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-slate-900 text-sm">David SHIMATU</h3>
+                            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded font-semibold shrink-0">L3 GL</span>
+                        </div>
+                        <p class="text-accent text-xs font-semibold mb-3">Développeur & Intégrateur</p>
+                        <p class="text-slate-500 text-xs mb-6 leading-relaxed">Responsable de l'intégration, des tests et de l'optimisation générale de l'application.</p>
+                    </div>
+                    <div class="flex space-x-3 text-slate-400 border-t border-slate-100 pt-3">
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="hover:text-blue-600 transition text-sm"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-slate-700 transition text-sm"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="max-w-screen-xl mx-auto px-6 mb-8 mt-12">
+        <div class="bg-navy rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-center text-white shadow-xl relative overflow-hidden">
+            <div class="absolute right-0 top-0 bottom-0 w-1/3 dots-bg opacity-10 pointer-events-none"></div>
+            
+            <div class="flex items-center space-x-4 mb-4 md:mb-0 z-10">
+                <div class="bg-accent text-white font-bold rounded-xl p-3 text-2xl leading-none">IE</div>
+                <div>
+                    <h3 class="font-bold text-lg tracking-wide">IntelliEditor</h3>
+                    <p class="text-slate-400 text-xs">Éditer intelligemment, créer librement.</p>
+                </div>
+            </div>
+            
+            <div class="text-center md:text-left z-10">
+                <p class="font-medium text-sm md:text-base">Rejoignez des milliers d'utilisateurs</p>
+                <p class="text-slate-400 text-xs md:text-sm mt-0.5">et boostez votre productivité dès aujourd'hui.</p>
+            </div>
+
+            <div class="hidden md:block w-4"></div>
+        </div>
+    </section>
+
+    <footer class="max-w-screen-xl mx-auto px-6 pb-12 flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-400 font-medium">
+        <p class="mb-4 md:mb-0">© 2025 IntelliEditor. Tous droits réservés.</p>
+        <div class="flex space-x-6">
+            <a href="#" class="hover:text-slate-600 transition">Confidentialité</a>
+            <a href="#" class="hover:text-slate-600 transition">Conditions d'utilisation</a>
+            <a href="#" class="hover:text-slate-600 transition">Contact</a>
+        </div>
+    </footer>
+
+    <script src="nav.js"></script>
+
+</body>
+</html>
