@@ -27,19 +27,19 @@ app->statusbar   = ta_statusbar;
 app->sidebar     = ta_sidebar;  // NULL si pas encore prête
 ```
 
-### 3. Connecter les boutons : C'EST FAIT
+    ### 3. Connecter les boutons : C'EST FAIT
 
-```c
-// Bouton "Reformuler"
-g_signal_connect(btn_rewrite, "clicked",
-                 G_CALLBACK(llm_bridge_on_rewrite_clicked),
-                 app);
+    ```c
+    // Bouton "Reformuler"
+    g_signal_connect(btn_rewrite, "clicked",
+                    G_CALLBACK(llm_bridge_on_rewrite_clicked),
+                    app);
 
-// Bouton "Corriger la grammaire"
-g_signal_connect(btn_grammar, "clicked",
-                 G_CALLBACK(llm_bridge_on_grammar_clicked),
-                 app);
-```
+    // Bouton "Corriger la grammaire"
+    g_signal_connect(btn_grammar, "clicked",
+                    G_CALLBACK(llm_bridge_on_grammar_clicked),
+                    app);
+    ```
 
 ### 4. Initialiser le LLM au démarrage : C'EST FAIT
 

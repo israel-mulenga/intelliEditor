@@ -2,6 +2,7 @@
 #include "ui/window.h"
 #include "editor/file_manager.h"
 #include "llm/llm_bridge.h"
+#include "nlp/nlp_highlighter.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -172,32 +173,14 @@ void on_rewrite_clicked(GtkWidget *widget, gpointer data) {
 }
 
 // Wrapper to call LLM bridge rephrase using current app widgets
-void on_llm_rewrite_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget;
-    AppWidgets *app_widgets = (AppWidgets *)data;
-    if (!app_widgets) return;
-
-    AppContext ctx;
-    ctx.source_view = GTK_SOURCE_VIEW(app_widgets->editor_view);
-    ctx.statusbar = app_widgets->statusbar;
-    ctx.sidebar = app_widgets->sidebar;
-
-    llm_bridge_on_write_clicked(widget, &ctx);
-}
+g_signal_connect(btn_rewrite, "clicked",
+                 G_CALLBACK(llm_bridge_on_write_clicked),
+                 app);
 
 // Wrapper to call LLM bridge grammar check using current app widgets
-void on_llm_grammar_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget;
-    AppWidgets *app_widgets = (AppWidgets *)data;
-    if (!app_widgets) return;
-
-    AppContext ctx;
-    ctx.source_view = GTK_SOURCE_VIEW(app_widgets->editor_view);
-    ctx.statusbar = app_widgets->statusbar;
-    ctx.sidebar = app_widgets->sidebar;
-
-    llm_bridge_on_gramma_clicked(widget, &ctx);
-}
+g_signal_connect(btn_grammar, "clicked",
+                 G_CALLBACK(llm_bridge_on_gramma_clicked),
+                 app);
 
 // Called when the welcome screen "Ouvrir l'éditeur" button is clicked
 void on_start_clicked(GtkWidget *widget, gpointer data) {

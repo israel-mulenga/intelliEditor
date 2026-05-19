@@ -6,6 +6,7 @@
 #include <hunspell/hunspell.h>
 #include "config/config_parser.h"
 #include "editor/gap_buffer.h"
+#include "nlp/nlp_highlighter.h"
 
 /* =========================================================
    STRUCTURE GLOBALE
@@ -36,6 +37,8 @@ typedef struct {
 
     Hunhandle *hun_en;        // Dictionnaire anglais
     Hunhandle *hun_fr;        // Dictionnaire francais
+
+    NlpHighlighter *highlighter;
 
 } AppWidgets;
 
