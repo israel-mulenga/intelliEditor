@@ -8,8 +8,9 @@
    ========================================================= */
 void on_correct_clicked(GtkWidget *widget, gpointer data);
 void on_rewrite_clicked(GtkWidget *widget, gpointer data);
-void on_llm_rewrite_clicked(GtkWidget *widget, gpointer data);
-void on_llm_grammar_clicked(GtkWidget *widget, gpointer data);
+void on_grammar_clicked(GtkWidget *widget, gpointer user_data);
+
+void on_rewrite_clicked(GtkWidget *widget,gpointer user_data);
 void on_start_clicked(GtkWidget *widget, gpointer data);
 void on_quit_clicked(GtkWidget *widget, gpointer data);
 

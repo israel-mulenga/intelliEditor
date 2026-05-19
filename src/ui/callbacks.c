@@ -173,14 +173,24 @@ void on_rewrite_clicked(GtkWidget *widget, gpointer data) {
 }
 
 // Wrapper to call LLM bridge rephrase using current app widgets
-g_signal_connect(btn_rewrite, "clicked",
-                 G_CALLBACK(llm_bridge_on_write_clicked),
-                 app);
+void setup_nlp_callbacks(GtkWidget *btn_rewrite,
+                         GtkWidget *btn_grammar,
+                         AppWidgets *app_widgets)
+{
+    g_signal_connect(
+        btn_rewrite,
+        "clicked",
+        G_CALLBACK(on_rewrite_clicked),
+        app_widgets
+    );
 
-// Wrapper to call LLM bridge grammar check using current app widgets
-g_signal_connect(btn_grammar, "clicked",
-                 G_CALLBACK(llm_bridge_on_gramma_clicked),
-                 app);
+    g_signal_connect(
+        btn_grammar,
+        "clicked",
+        G_CALLBACK(on_grammar_clicked),
+        app_widgets
+    );
+}
 
 // Called when the welcome screen "Ouvrir l'éditeur" button is clicked
 void on_start_clicked(GtkWidget *widget, gpointer data) {

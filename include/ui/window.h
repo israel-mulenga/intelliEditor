@@ -7,6 +7,7 @@
 #include "config/config_parser.h"
 #include "editor/gap_buffer.h"
 #include "nlp/nlp_highlighter.h"
+#include "rules/parser.h"
 
 /* =========================================================
    STRUCTURE GLOBALE
@@ -38,7 +39,11 @@ typedef struct {
     Hunhandle *hun_en;        // Dictionnaire anglais
     Hunhandle *hun_fr;        // Dictionnaire francais
 
+      char *rules_file_path;
+   RuleSet *ruleset;
+
     NlpHighlighter *highlighter;
+    
 
 } AppWidgets;
 
